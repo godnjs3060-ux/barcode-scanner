@@ -15,7 +15,8 @@
   :root{
     --bg:#0f0f0f;--surface:#1a1a1a;--surface2:#242424;--border:#2e2e2e;
     --accent:#00e5a0;--accent-dim:#003d2b;--text:#f0f0f0;--muted:#888;
-    --danger:#ff4d4d;--font-mono:'IBM Plex Mono',monospace;--font-main:'Noto Sans KR',sans-serif;
+    --danger:#ff4d4d;--warn:#f5a623;
+    --font-mono:'IBM Plex Mono',monospace;--font-main:'Noto Sans KR',sans-serif;
   }
   *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
   html,body{background:var(--bg);color:var(--text);font-family:var(--font-main)}
@@ -23,8 +24,9 @@
   header{padding:1.25rem 1.25rem 0.75rem;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--border)}
   .logo{width:32px;height:32px;background:var(--accent);border-radius:6px;display:flex;align-items:center;justify-content:center}
   .logo svg{width:18px;height:18px;fill:none;stroke:#000;stroke-width:2.5;stroke-linecap:round}
-  h1{font-size:15px;font-weight:500;letter-spacing:0.02em}
+  h1{font-size:15px;font-weight:500}
   .count-badge{margin-left:auto;font-family:var(--font-mono);font-size:12px;color:var(--accent);background:var(--accent-dim);padding:3px 10px;border-radius:20px}
+
   #scanner-wrap{padding:1.25rem;flex-shrink:0}
   #reader{width:100%;border-radius:14px;overflow:hidden;border:1px solid var(--border);background:#000;min-height:240px}
   #reader video{width:100%!important;border-radius:14px}
@@ -32,24 +34,26 @@
   #cam-btn{display:block;width:100%;margin-top:1rem;padding:13px;background:var(--accent);color:#000;border:none;border-radius:10px;font-size:14px;font-weight:500;font-family:var(--font-main);cursor:pointer}
   #cam-btn.stop{background:var(--surface2);color:var(--muted);border:1px solid var(--border)}
 
+  /* 수량 입력 패널 */
   #result-panel{margin:0 1.25rem;background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;display:none}
-  .result-header{padding:12px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px}
-  .result-header .dot{width:8px;height:8px;border-radius:50%;background:var(--accent);flex-shrink:0}
-  .result-header .label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em}
-  #barcode-val{padding:10px 14px 0;font-family:var(--font-mono);font-size:13px;word-break:break-all;color:var(--muted)}
+  .panel-header{padding:12px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px}
+  .panel-header .dot{width:8px;height:8px;border-radius:50%;background:var(--accent);flex-shrink:0}
+  .panel-header .dot.edit{background:var(--warn)}
+  .panel-title{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em}
+  #barcode-raw{padding:10px 14px 0;font-family:var(--font-mono);font-size:12px;word-break:break-all;color:var(--muted)}
   #fields-preview{display:flex;flex-wrap:wrap;gap:6px;padding:8px 14px 0}
   .field-chip{background:var(--surface2);color:var(--text);font-family:var(--font-mono);font-size:12px;padding:3px 8px;border-radius:6px;border:1px solid var(--border)}
   .field-chip.qty-chip{background:var(--accent-dim);color:var(--accent);border-color:transparent}
-  .field-label{font-size:10px;color:var(--muted);margin-right:3px}
+  .field-num{font-size:10px;color:var(--muted);margin-right:3px}
 
   .calc-wrap{padding:14px}
   .calc-display{background:var(--surface2);border-radius:10px;padding:10px 14px;margin-bottom:10px;min-height:64px;display:flex;flex-direction:column;align-items:flex-end;justify-content:center}
-  .calc-hint{font-size:11px;color:var(--muted);margin-bottom:2px}
-  .calc-expr{font-family:var(--font-mono);font-size:13px;color:var(--muted);min-height:18px;word-break:break-all;text-align:right}
+  .calc-hint{font-size:11px;color:var(--muted);margin-bottom:4px}
+  .calc-expr{font-family:var(--font-mono);font-size:13px;color:var(--muted);min-height:16px;text-align:right}
   .calc-result{font-family:var(--font-mono);font-size:26px;font-weight:500;color:var(--text);line-height:1.1}
   .calc-result.error{color:var(--danger);font-size:16px}
   .calc-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
-  .calc-btn{padding:16px 0;border:none;border-radius:8px;font-size:17px;font-weight:500;font-family:var(--font-mono);cursor:pointer;background:var(--surface2);color:var(--text);transition:opacity 0.1s,transform 0.1s}
+  .calc-btn{padding:16px 0;border:none;border-radius:8px;font-size:17px;font-weight:500;font-family:var(--font-mono);cursor:pointer;background:var(--surface2);color:var(--text)}
   .calc-btn:active{opacity:0.7;transform:scale(0.95)}
   .calc-btn.op{background:#1e2e28;color:var(--accent)}
   .calc-btn.action{background:#1a1a2e;color:#7b8cde;font-size:14px;font-family:var(--font-main)}
@@ -57,25 +61,46 @@
   .calc-btn.save{background:var(--accent);color:#000;font-family:var(--font-main);font-size:14px}
   .calc-btn.cancel{background:var(--surface2);color:var(--muted);font-family:var(--font-main);font-size:13px}
 
+  /* 목록 */
   #list-section{flex:1;padding:1.25rem}
   .list-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
   .list-header span{font-size:13px;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em}
-  .header-btns{display:flex;gap:6px}
-  .export-btn{font-size:12px;padding:5px 12px;background:var(--surface2);color:var(--muted);border:1px solid var(--border);border-radius:6px;cursor:pointer;font-family:var(--font-main)}
-  .reset-btn{font-size:12px;padding:5px 12px;background:transparent;color:var(--danger);border:1px solid var(--danger);border-radius:6px;cursor:pointer;font-family:var(--font-main)}
+  .header-btns{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+  .export-btn{font-size:12px;padding:5px 10px;background:var(--surface2);color:var(--muted);border:1px solid var(--border);border-radius:6px;cursor:pointer;font-family:var(--font-main)}
+  .reset-btn{font-size:12px;padding:5px 10px;background:transparent;color:var(--danger);border:1px solid var(--danger);border-radius:6px;cursor:pointer;font-family:var(--font-main)}
   #table-wrap{overflow-x:auto;border-radius:10px;border:1px solid var(--border)}
-  table{width:100%;border-collapse:collapse;font-size:12px;min-width:400px}
+  table{width:100%;border-collapse:collapse;font-size:12px;min-width:500px}
   thead tr{background:var(--surface2)}
   th{padding:8px 10px;text-align:left;color:var(--muted);font-weight:500;font-size:11px;white-space:nowrap;border-bottom:1px solid var(--border)}
   td{padding:8px 10px;border-bottom:1px solid var(--border);color:var(--text);vertical-align:middle}
   tr:last-child td{border-bottom:none}
   tr:hover td{background:var(--surface2)}
-  .td-mono{font-family:var(--font-mono)}
+  .td-mono{font-family:var(--font-mono);font-size:12px}
   .td-qty{color:var(--accent);font-family:var(--font-mono);font-weight:500}
-  .td-del{text-align:center}
-  .btn-del{background:none;border:none;color:#444;cursor:pointer;font-size:13px;padding:2px 6px}
-  .btn-del:hover{color:var(--danger)}
+  .td-actions{display:flex;gap:4px;justify-content:center}
+  .btn-edit{background:none;border:1px solid var(--border);color:var(--warn);cursor:pointer;font-size:11px;padding:3px 7px;border-radius:5px}
+  .btn-del{background:none;border:1px solid var(--border);color:#555;cursor:pointer;font-size:11px;padding:3px 7px;border-radius:5px}
+  .btn-del:hover{color:var(--danger);border-color:var(--danger)}
+  .btn-edit:hover{border-color:var(--warn)}
 
+  /* 수정 모달 */
+  #edit-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:100;align-items:flex-end;justify-content:center;padding-bottom:0}
+  #edit-modal.show{display:flex}
+  .edit-box{background:var(--surface);border:1px solid var(--border);border-radius:16px 16px 0 0;padding:1.25rem;width:100%;max-width:480px}
+  .edit-box h3{font-size:14px;font-weight:500;margin-bottom:4px}
+  .edit-box .edit-sub{font-size:12px;color:var(--muted);margin-bottom:1rem;font-family:var(--font-mono);word-break:break-all}
+  .edit-fields{display:flex;flex-direction:column;gap:8px;margin-bottom:1rem}
+  .edit-field-row{display:flex;align-items:center;gap:8px}
+  .edit-field-row label{font-size:12px;color:var(--muted);min-width:56px}
+  .edit-field-row input{flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:8px 10px;color:var(--text);font-family:var(--font-mono);font-size:13px;outline:none}
+  .edit-field-row input:focus{border-color:var(--accent)}
+  .edit-field-row input.qty-input{border-color:var(--accent-dim);color:var(--accent)}
+  .edit-actions{display:flex;gap:8px}
+  .edit-actions button{flex:1;padding:11px;border-radius:8px;border:none;font-size:14px;font-family:var(--font-main);cursor:pointer;font-weight:500}
+  .btn-edit-cancel{background:var(--surface2);color:var(--muted)}
+  .btn-edit-save{background:var(--accent);color:#000}
+
+  /* 확인 모달 */
   #confirm-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:100;align-items:center;justify-content:center}
   #confirm-modal.show{display:flex}
   .modal-box{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:1.5rem;width:280px;text-align:center}
@@ -106,8 +131,8 @@
   </div>
 
   <div id="result-panel">
-    <div class="result-header"><div class="dot"></div><span class="label">수량 확인 / 수정</span></div>
-    <div id="barcode-val">—</div>
+    <div class="panel-header"><div class="dot" id="panel-dot"></div><span class="panel-title" id="panel-title">수량 확인 / 수정</span></div>
+    <div id="barcode-raw">—</div>
     <div id="fields-preview"></div>
     <div class="calc-wrap">
       <div class="calc-display">
@@ -153,6 +178,20 @@
   </div>
 </div>
 
+<!-- 수정 모달 -->
+<div id="edit-modal">
+  <div class="edit-box">
+    <h3>항목 수정</h3>
+    <div class="edit-sub" id="edit-barcode-raw"></div>
+    <div class="edit-fields" id="edit-fields"></div>
+    <div class="edit-actions">
+      <button class="btn-edit-cancel" id="edit-cancel">취소</button>
+      <button class="btn-edit-save" id="edit-save">저장</button>
+    </div>
+  </div>
+</div>
+
+<!-- 초기화 확인 모달 -->
 <div id="confirm-modal">
   <div class="modal-box">
     <h3>전체 초기화</h3>
@@ -163,23 +202,39 @@
     </div>
   </div>
 </div>
+
 <div class="toast" id="toast"></div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 <script>
-const STORAGE_KEY='barcode_records_v2';
+// 이전 버전 키들도 마이그레이션
+const STORAGE_KEY='barcode_records_v3';
 let records=[];
 let scanner=null,scanning=false,lastCode='',lastTime=0;
 let expr='';
-let defaultQty=1; // 바코드 3번째 값에서 가져온 기본 수량
+let defaultQty=1;
+let editingIdx=-1;
 
 function saveToStorage(){try{localStorage.setItem(STORAGE_KEY,JSON.stringify(records));}catch(e){}}
-function loadFromStorage(){try{const d=localStorage.getItem(STORAGE_KEY);if(d)records=JSON.parse(d);}catch(e){records=[];}}
+function loadFromStorage(){
+  // v3 먼저, 없으면 v2, v1 순서로 마이그레이션
+  try{
+    for(const k of[STORAGE_KEY,'barcode_records_v2','barcode_records_v1']){
+      const d=localStorage.getItem(k);
+      if(d){records=JSON.parse(d);break;}
+    }
+    // fields 없는 구버전 데이터 변환
+    records=records.map(r=>{
+      if(!r.fields)r.fields=splitBarcode(r.barcode||'');
+      return r;
+    });
+  }catch(e){records=[];}
+}
 
 const camBtn=document.getElementById('cam-btn');
 const resultPanel=document.getElementById('result-panel');
-const barcodeValEl=document.getElementById('barcode-val');
+const barcodeRawEl=document.getElementById('barcode-raw');
 const fieldsPreview=document.getElementById('fields-preview');
 const calcExprEl=document.getElementById('calc-expr');
 const calcResultEl=document.getElementById('calc-result');
@@ -188,19 +243,19 @@ const countBadge=document.getElementById('count-badge');
 const tableWrap=document.getElementById('table-wrap');
 const toast=document.getElementById('toast');
 const confirmModal=document.getElementById('confirm-modal');
+const editModal=document.getElementById('edit-modal');
+const panelDot=document.getElementById('panel-dot');
+const panelTitle=document.getElementById('panel-title');
 
 function showToast(msg){toast.textContent=msg;toast.classList.add('show');clearTimeout(toast._t);toast._t=setTimeout(()=>toast.classList.remove('show'),2000);}
 function fmt(d){const p=n=>String(n).padStart(2,'0');return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}:${p(d.getSeconds())}`;}
 
-// / 분리, 빈값 제거
-function splitBarcode(code){return code.split('/').map(s=>s.trim()).filter(s=>s!=='');}
+function splitBarcode(code){
+  return code.split('/').map(s=>s.trim()).filter(s=>s!=='');
+}
 
-// 3번째 항목(index 2)에서 수량 추출, 없거나 숫자 아니면 1
 function extractQty(fields){
-  if(fields.length>=3){
-    const v=parseFloat(fields[2]);
-    if(!isNaN(v)&&v>0)return v;
-  }
+  if(fields.length>=3){const v=parseFloat(fields[2]);if(!isNaN(v)&&v>0)return v;}
   return 1;
 }
 
@@ -214,12 +269,7 @@ function evalExpr(e){
 }
 
 function updateCalc(){
-  if(!expr){
-    calcExprEl.textContent='';
-    calcResultEl.textContent=defaultQty;
-    calcResultEl.className='calc-result';
-    return;
-  }
+  if(!expr){calcExprEl.textContent='';calcResultEl.textContent=defaultQty;calcResultEl.className='calc-result';return;}
   calcExprEl.textContent=expr.replace(/\*/g,'×').replace(/\//g,'÷');
   const r=evalExpr(expr);
   if(r!==null){calcResultEl.textContent=r;calcResultEl.className='calc-result';}
@@ -233,9 +283,8 @@ function getFinalQty(){
 }
 
 document.querySelector('.calc-grid').addEventListener('click',e=>{
-  const btn=e.target.closest('.calc-btn');
-  if(!btn)return;
-  const action=btn.dataset.action;const val=btn.dataset.val;
+  const btn=e.target.closest('.calc-btn');if(!btn)return;
+  const action=btn.dataset.action,val=btn.dataset.val;
   if(action==='clear'){expr='';updateCalc();}
   else if(action==='back'){expr=expr.slice(0,-1);updateCalc();}
   else if(action==='cancel'){resultPanel.style.display='none';expr='';}
@@ -249,16 +298,47 @@ document.querySelector('.calc-grid').addEventListener('click',e=>{
 document.getElementById('save-btn').addEventListener('click',()=>{
   const qty=getFinalQty();
   if(qty===null){showToast('올바른 수량을 입력해주세요');return;}
-  const code=barcodeValEl.textContent;
+  const code=barcodeRawEl.textContent;
   const fields=splitBarcode(code);
-  // 3번째 항목을 최종 수량으로 덮어씀
-  if(fields.length>=3)fields[2]=String(qty);
-  else while(fields.length<3)fields.push('');fields[2]=String(qty);
+  // 3번째 항목 수량으로 덮어씀
+  while(fields.length<3)fields.push('');
+  fields[2]=String(qty);
   records.push({barcode:code,fields,datetime:fmt(new Date()),qty});
   saveToStorage();
   resultPanel.style.display='none';
   expr='';
   renderList();showToast('저장되었습니다');
+});
+
+// ── 수정 모달 ──
+function openEditModal(idx){
+  editingIdx=idx;
+  const r=records[idx];
+  document.getElementById('edit-barcode-raw').textContent=r.barcode;
+  const container=document.getElementById('edit-fields');
+  container.innerHTML='';
+  r.fields.forEach((f,i)=>{
+    const row=document.createElement('div');row.className='edit-field-row';
+    const label=document.createElement('label');label.textContent=i===2?'수량(3번째)':`항목 ${i+1}`;
+    const input=document.createElement('input');
+    input.type='text';input.value=f;input.dataset.idx=i;
+    if(i===2)input.className='qty-input';
+    row.appendChild(label);row.appendChild(input);
+    container.appendChild(row);
+  });
+  editModal.classList.add('show');
+}
+
+document.getElementById('edit-cancel').addEventListener('click',()=>editModal.classList.remove('show'));
+document.getElementById('edit-save').addEventListener('click',()=>{
+  const inputs=document.querySelectorAll('#edit-fields input');
+  const r=records[editingIdx];
+  inputs.forEach(inp=>{r.fields[+inp.dataset.idx]=inp.value;});
+  // 수량 동기화
+  const qtyVal=parseFloat(r.fields[2]);
+  r.qty=(!isNaN(qtyVal)&&qtyVal>0)?qtyVal:1;
+  saveToStorage();renderList();
+  editModal.classList.remove('show');showToast('수정되었습니다');
 });
 
 function getMaxCols(){let m=0;records.forEach(r=>{if(r.fields&&r.fields.length>m)m=r.fields.length;});return m;}
@@ -271,39 +351,34 @@ function renderList(){
   }
   const maxCols=getMaxCols();
   let html='<table><thead><tr><th>날짜/시간</th>';
-  for(let i=0;i<maxCols;i++)html+=`<th>${i===2?'수량(3번째)':'항목'+(i+1)}</th>`;
-  html+='<th></th></tr></thead><tbody>';
-  [...records].reverse().forEach((r,i)=>{
-    const idx=records.length-1-i;
+  for(let i=0;i<maxCols;i++)html+=`<th>${i===2?'수량':'항목'+(i+1)}</th>`;
+  html+='<th>관리</th></tr></thead><tbody>';
+  [...records].reverse().forEach((r,ri)=>{
+    const idx=records.length-1-ri;
     html+=`<tr><td class="td-mono" style="white-space:nowrap;font-size:11px">${r.datetime}</td>`;
     for(let c=0;c<maxCols;c++){
       const val=r.fields&&r.fields[c]!==undefined?r.fields[c]:'';
       html+=c===2?`<td class="td-qty">${val}</td>`:`<td class="td-mono">${val}</td>`;
     }
-    html+=`<td class="td-del"><button class="btn-del" data-i="${idx}">✕</button></td></tr>`;
+    html+=`<td><div class="td-actions"><button class="btn-edit" data-i="${idx}">수정</button><button class="btn-del" data-i="${idx}">삭제</button></div></td></tr>`;
   });
   html+='</tbody></table>';
   tableWrap.innerHTML=html;
-  tableWrap.querySelectorAll('.btn-del').forEach(b=>b.addEventListener('click',()=>{
-    records.splice(+b.dataset.i,1);saveToStorage();renderList();
-  }));
+  tableWrap.querySelectorAll('.btn-edit').forEach(b=>b.addEventListener('click',()=>openEditModal(+b.dataset.i)));
+  tableWrap.querySelectorAll('.btn-del').forEach(b=>b.addEventListener('click',()=>{records.splice(+b.dataset.i,1);saveToStorage();renderList();}));
 }
 
 function onDetected(code){
   const now=Date.now();
   if(code===lastCode&&now-lastTime<3000)return;
   lastCode=code;lastTime=now;
-
   const fields=splitBarcode(code);
   defaultQty=extractQty(fields);
-
-  barcodeValEl.textContent=code;
-  fieldsPreview.innerHTML=fields.map((f,i)=>`<span class="field-chip${i===2?' qty-chip':''}"><span class="field-label">${i+1}</span>${f}</span>`).join('');
-
-  // 3번째 값이 있으면 힌트 표시
-  calcHint.textContent=fields.length>=3?`바코드 수량: ${defaultQty} (수정하려면 숫자 입력)`:'수량을 입력하세요 (기본값 1)';
-  expr='';
-  updateCalc();
+  barcodeRawEl.textContent=code;
+  fieldsPreview.innerHTML=fields.map((f,i)=>`<span class="field-chip${i===2?' qty-chip':''}"><span class="field-num">${i+1}</span>${f}</span>`).join('');
+  calcHint.textContent=fields.length>=3?`바코드 수량: ${defaultQty} (그대로 저장하거나 수정)`:'수량 없음 → 기본값 1';
+  panelDot.className='dot';panelTitle.textContent='수량 확인 / 수정';
+  expr='';updateCalc();
   resultPanel.style.display='block';
   resultPanel.scrollIntoView({behavior:'smooth',block:'nearest'});
 }
@@ -330,15 +405,14 @@ document.getElementById('modal-ok').addEventListener('click',()=>{
 
 function buildExportRows(){
   const maxCols=getMaxCols();
-  const headers=['날짜/시간',...Array.from({length:maxCols},(_,i)=>i===2?'수량(3번째)':`항목${i+1}`)];
+  const headers=['날짜/시간',...Array.from({length:maxCols},(_,i)=>i===2?'수량':`항목${i+1}`)];
   const rows=records.map(r=>{
     const row={'날짜/시간':r.datetime};
-    for(let i=0;i<maxCols;i++)row[i===2?'수량(3번째)':`항목${i+1}`]=r.fields&&r.fields[i]!==undefined?r.fields[i]:'';
+    for(let i=0;i<maxCols;i++)row[i===2?'수량':`항목${i+1}`]=r.fields&&r.fields[i]!==undefined?r.fields[i]:'';
     return row;
   });
   return{headers,rows};
 }
-
 document.getElementById('csv-btn').addEventListener('click',()=>{
   if(!records.length){showToast('저장할 데이터가 없습니다');return;}
   const{headers,rows}=buildExportRows();
@@ -346,7 +420,6 @@ document.getElementById('csv-btn').addEventListener('click',()=>{
   const blob=new Blob([lines.join('\n')],{type:'text/csv;charset=utf-8'});
   const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`scan_${new Date().toISOString().slice(0,10)}.csv`;a.click();
 });
-
 document.getElementById('xlsx-btn').addEventListener('click',()=>{
   if(!records.length){showToast('저장할 데이터가 없습니다');return;}
   const{rows}=buildExportRows();
