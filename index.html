@@ -11,143 +11,139 @@
 <title>바코드 스캐너</title>
 <link rel="manifest" href="manifest.json">
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Noto+Sans+KR:wght@400;500&display=swap');
-  :root{
-    --bg:#0f0f0f;--surface:#1a1a1a;--surface2:#242424;--border:#2e2e2e;
-    --accent:#00e5a0;--accent-dim:#003d2b;--text:#f0f0f0;--muted:#888;
-    --danger:#ff4d4d;--warn:#f5a623;
-    --font-mono:'IBM Plex Mono',monospace;--font-main:'Noto Sans KR',sans-serif;
-  }
-  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-  html,body{background:var(--bg);color:var(--text);font-family:var(--font-main)}
-  #app{max-width:480px;margin:0 auto;min-height:100vh;display:flex;flex-direction:column;padding:0 0 2rem}
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Noto+Sans+KR:wght@400;500&display=swap');
+:root{
+  --bg:#0f0f0f;--surface:#1a1a1a;--surface2:#242424;--border:#2e2e2e;
+  --accent:#00e5a0;--accent-dim:#003d2b;--text:#f0f0f0;--muted:#888;
+  --danger:#ff4d4d;--warn:#f5a623;
+  --font-mono:'IBM Plex Mono',monospace;--font-main:'Noto Sans KR',sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{background:var(--bg);color:var(--text);font-family:var(--font-main)}
+#app{max-width:480px;margin:0 auto;min-height:100vh;display:flex;flex-direction:column;padding:0 0 2rem}
 
-  /* 카메라 최상단 고정 */
-  #scanner-wrap{padding:0;flex-shrink:0;position:sticky;top:0;z-index:10;background:var(--bg)}
-  #reader{width:100%;border-radius:0;overflow:hidden;background:#000;max-height:220px}
-  #reader video{width:100%!important;max-height:220px;object-fit:cover;display:block}
-  #reader img,#reader canvas{display:none!important}
-  #cam-btn{display:block;width:100%;padding:11px;background:var(--accent);color:#000;border:none;font-size:14px;font-weight:500;font-family:var(--font-main);cursor:pointer}
-  #cam-btn.stop{background:var(--surface2);color:var(--muted);border-bottom:1px solid var(--border)}
-  /* 스캔 오버레이 */
-  #scanner-box{position:relative;width:100%;max-height:220px;overflow:hidden;background:#000}
-  #scan-overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none}
-  .scan-frame{position:relative;width:55%;aspect-ratio:1}
-  .scan-corner{position:absolute;width:20px;height:20px;border-color:var(--accent);border-style:solid;border-width:0}
-  .scan-corner.tl{top:0;left:0;border-top-width:2.5px;border-left-width:2.5px}
-  .scan-corner.tr{top:0;right:0;border-top-width:2.5px;border-right-width:2.5px}
-  .scan-corner.bl{bottom:0;left:0;border-bottom-width:2.5px;border-left-width:2.5px}
-  .scan-corner.br{bottom:0;right:0;border-bottom-width:2.5px;border-right-width:2.5px}
-  .scan-line{position:absolute;left:5%;right:5%;height:1.5px;background:linear-gradient(90deg,transparent,var(--accent),transparent);animation:scanline 2s ease-in-out infinite}
-  @keyframes scanline{0%{top:8%}50%{top:88%}100%{top:8%}}
+/* 카메라 영역 */
+#cam-wrap{position:sticky;top:0;z-index:10;background:#000;flex-shrink:0}
+#cam-box{position:relative;width:100%;height:220px;background:#000;overflow:hidden}
+#cam-video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+#cam-placeholder{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;color:var(--muted);font-size:13px}
+#cam-placeholder svg{opacity:0.3}
+#scan-overlay{position:absolute;inset:0;pointer-events:none;display:flex;align-items:center;justify-content:center}
+.s-frame{position:relative;width:200px;height:200px}
+.s-corner{position:absolute;width:22px;height:22px;border-color:var(--accent);border-style:solid;border-width:0}
+.s-corner.tl{top:0;left:0;border-top-width:3px;border-left-width:3px}
+.s-corner.tr{top:0;right:0;border-top-width:3px;border-right-width:3px}
+.s-corner.bl{bottom:0;left:0;border-bottom-width:3px;border-left-width:3px}
+.s-corner.br{bottom:0;right:0;border-bottom-width:3px;border-right-width:3px}
+.s-line{position:absolute;left:4px;right:4px;height:2px;background:linear-gradient(90deg,transparent,var(--accent),transparent);animation:sline 2s ease-in-out infinite}
+@keyframes sline{0%{top:4px}50%{top:192px}100%{top:4px}}
+#cam-btn{display:block;width:100%;padding:11px;border:none;font-size:14px;font-weight:500;font-family:var(--font-main);cursor:pointer;background:var(--accent);color:#000}
+#cam-btn.on{background:var(--surface2);color:var(--muted);border-bottom:1px solid var(--border)}
+#cam-status{position:absolute;bottom:8px;left:0;right:0;text-align:center;font-size:11px;color:rgba(255,255,255,0.6);pointer-events:none}
 
+header{padding:1rem 1.25rem 0.75rem;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--border)}
+.logo{width:30px;height:30px;background:var(--accent);border-radius:6px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.logo svg{width:16px;height:16px;fill:none;stroke:#000;stroke-width:2.5;stroke-linecap:round}
+h1{font-size:15px;font-weight:500}
+.count-badge{margin-left:auto;font-family:var(--font-mono);font-size:12px;color:var(--accent);background:var(--accent-dim);padding:3px 10px;border-radius:20px}
 
-  header{padding:1rem 1.25rem 0.75rem;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--border)}
-  .logo{width:30px;height:30px;background:var(--accent);border-radius:6px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-  .logo svg{width:16px;height:16px;fill:none;stroke:#000;stroke-width:2.5;stroke-linecap:round}
-  h1{font-size:15px;font-weight:500}
-  .count-badge{margin-left:auto;font-family:var(--font-mono);font-size:12px;color:var(--accent);background:var(--accent-dim);padding:3px 10px;border-radius:20px}
+/* 수량 계산기 패널 */
+#result-panel{margin:0.75rem 1.25rem;background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;display:none}
+.panel-hdr{padding:10px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px}
+.panel-dot{width:8px;height:8px;border-radius:50%;background:var(--accent);flex-shrink:0}
+.panel-ttl{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em}
+#bc-raw{padding:10px 14px 0;font-family:var(--font-mono);font-size:12px;word-break:break-all;color:var(--muted)}
+#fields-preview{display:flex;flex-wrap:wrap;gap:5px;padding:8px 14px 0}
+.fchip{background:var(--surface2);color:var(--text);font-family:var(--font-mono);font-size:11px;padding:2px 7px;border-radius:5px;border:1px solid var(--border)}
+.fchip.qty{background:var(--accent-dim);color:var(--accent);border-color:transparent}
+.fnum{font-size:10px;color:var(--muted);margin-right:2px}
+.calc-wrap{padding:12px}
+.calc-disp{background:var(--surface2);border-radius:10px;padding:10px 14px;margin-bottom:10px;min-height:62px;display:flex;flex-direction:column;align-items:flex-end;justify-content:center}
+.calc-hint{font-size:11px;color:var(--muted);margin-bottom:3px}
+.calc-expr{font-family:var(--font-mono);font-size:13px;color:var(--muted);min-height:16px;text-align:right}
+.calc-num{font-family:var(--font-mono);font-size:26px;font-weight:500;color:var(--text);line-height:1.1}
+.calc-num.err{color:var(--danger);font-size:16px}
+.calc-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:7px}
+.cb{padding:15px 0;border:none;border-radius:8px;font-size:17px;font-weight:500;font-family:var(--font-mono);cursor:pointer;background:var(--surface2);color:var(--text)}
+.cb:active{opacity:0.7;transform:scale(0.96)}
+.cb.op{background:#1e2e28;color:var(--accent)}
+.cb.act{background:#1a1a2e;color:#7b8cde;font-size:14px;font-family:var(--font-main)}
+.cb.zero{grid-column:span 2}
+.cb.save{background:var(--accent);color:#000;font-family:var(--font-main);font-size:14px}
+.cb.cancel{background:var(--surface2);color:var(--muted);font-family:var(--font-main);font-size:13px}
 
-  /* 수량 입력 패널 */
-  #result-panel{margin:0.75rem 1.25rem;background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;display:none}
-  .panel-header{padding:10px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px}
-  .panel-header .dot{width:8px;height:8px;border-radius:50%;background:var(--accent);flex-shrink:0}
-  .panel-title{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em}
-  #barcode-raw{padding:10px 14px 0;font-family:var(--font-mono);font-size:12px;word-break:break-all;color:var(--muted)}
-  #fields-preview{display:flex;flex-wrap:wrap;gap:6px;padding:8px 14px 0}
-  .field-chip{background:var(--surface2);color:var(--text);font-family:var(--font-mono);font-size:12px;padding:3px 8px;border-radius:6px;border:1px solid var(--border)}
-  .field-chip.qty-chip{background:var(--accent-dim);color:var(--accent);border-color:transparent}
-  .field-num{font-size:10px;color:var(--muted);margin-right:3px}
+/* 목록 */
+#list-section{flex:1;padding:1rem 1.25rem}
+.list-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.list-hdr span{font-size:13px;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em}
+.hbtns{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+.ebtn{font-size:12px;padding:5px 10px;background:var(--surface2);color:var(--muted);border:1px solid var(--border);border-radius:6px;cursor:pointer;font-family:var(--font-main)}
+.rbtn{font-size:12px;padding:5px 10px;background:transparent;color:var(--danger);border:1px solid var(--danger);border-radius:6px;cursor:pointer;font-family:var(--font-main)}
+#table-wrap{overflow-x:auto;border-radius:10px;border:1px solid var(--border)}
+table{width:100%;border-collapse:collapse;font-size:12px;min-width:500px}
+thead tr{background:var(--surface2)}
+th{padding:8px 10px;text-align:left;color:var(--muted);font-weight:500;font-size:11px;white-space:nowrap;border-bottom:1px solid var(--border)}
+td{padding:8px 10px;border-bottom:1px solid var(--border);color:var(--text);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:var(--surface2)}
+.tm{font-family:var(--font-mono);font-size:12px}
+.tq{color:var(--accent);font-family:var(--font-mono);font-weight:500}
+.tact{display:flex;gap:4px;justify-content:center}
+.bedit{background:none;border:1px solid var(--border);color:var(--warn);cursor:pointer;font-size:11px;padding:3px 7px;border-radius:5px}
+.bdel{background:none;border:1px solid var(--border);color:#555;cursor:pointer;font-size:11px;padding:3px 7px;border-radius:5px}
+.bdel:hover{color:var(--danger);border-color:var(--danger)}
+.bedit:hover{border-color:var(--warn)}
 
-  .calc-wrap{padding:12px}
-  .calc-display{background:var(--surface2);border-radius:10px;padding:10px 14px;margin-bottom:10px;min-height:60px;display:flex;flex-direction:column;align-items:flex-end;justify-content:center}
-  .calc-hint{font-size:11px;color:var(--muted);margin-bottom:4px}
-  .calc-expr{font-family:var(--font-mono);font-size:13px;color:var(--muted);min-height:16px;text-align:right}
-  .calc-result{font-family:var(--font-mono);font-size:24px;font-weight:500;color:var(--text);line-height:1.1}
-  .calc-result.error{color:var(--danger);font-size:16px}
-  .calc-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:7px}
-  .calc-btn{padding:14px 0;border:none;border-radius:8px;font-size:17px;font-weight:500;font-family:var(--font-mono);cursor:pointer;background:var(--surface2);color:var(--text)}
-  .calc-btn:active{opacity:0.7;transform:scale(0.95)}
-  .calc-btn.op{background:#1e2e28;color:var(--accent)}
-  .calc-btn.action{background:#1a1a2e;color:#7b8cde;font-size:14px;font-family:var(--font-main)}
-  .calc-btn.zero{grid-column:span 2}
-  .calc-btn.save{background:var(--accent);color:#000;font-family:var(--font-main);font-size:14px}
-  .calc-btn.cancel{background:var(--surface2);color:var(--muted);font-family:var(--font-main);font-size:13px}
+/* 모달 공통 */
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:200;align-items:center;justify-content:center}
+.modal-bg.show{display:flex}
+.mbox{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:1.5rem;width:290px;text-align:center}
+.mbox h3{font-size:15px;font-weight:500;margin-bottom:8px}
+.mbox p{font-size:13px;color:var(--muted);margin-bottom:1.25rem;line-height:1.6}
+.mbtns{display:flex;gap:8px}
+.mbtns button{flex:1;padding:11px;border-radius:8px;border:none;font-size:14px;font-family:var(--font-main);cursor:pointer;font-weight:500}
+.bno{background:var(--surface2);color:var(--muted)}
+.bdanger{background:var(--danger);color:#fff}
 
-  /* 목록 */
-  #list-section{flex:1;padding:1rem 1.25rem}
-  .list-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
-  .list-header span{font-size:13px;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em}
-  .header-btns{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
-  .export-btn{font-size:12px;padding:5px 10px;background:var(--surface2);color:var(--muted);border:1px solid var(--border);border-radius:6px;cursor:pointer;font-family:var(--font-main)}
-  .reset-btn{font-size:12px;padding:5px 10px;background:transparent;color:var(--danger);border:1px solid var(--danger);border-radius:6px;cursor:pointer;font-family:var(--font-main)}
-  #table-wrap{overflow-x:auto;border-radius:10px;border:1px solid var(--border)}
-  table{width:100%;border-collapse:collapse;font-size:12px;min-width:500px}
-  thead tr{background:var(--surface2)}
-  th{padding:8px 10px;text-align:left;color:var(--muted);font-weight:500;font-size:11px;white-space:nowrap;border-bottom:1px solid var(--border)}
-  td{padding:8px 10px;border-bottom:1px solid var(--border);color:var(--text);vertical-align:middle}
-  tr:last-child td{border-bottom:none}
-  tr:hover td{background:var(--surface2)}
-  .td-mono{font-family:var(--font-mono);font-size:12px}
-  .td-qty{color:var(--accent);font-family:var(--font-mono);font-weight:500}
-  .td-actions{display:flex;gap:4px;justify-content:center}
-  .btn-edit{background:none;border:1px solid var(--border);color:var(--warn);cursor:pointer;font-size:11px;padding:3px 7px;border-radius:5px}
-  .btn-del{background:none;border:1px solid var(--border);color:#555;cursor:pointer;font-size:11px;padding:3px 7px;border-radius:5px}
-  .btn-del:hover{color:var(--danger);border-color:var(--danger)}
-  .btn-edit:hover{border-color:var(--warn)}
+/* 수정 모달 (하단 시트) */
+#edit-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:200;align-items:flex-end;justify-content:center}
+#edit-modal.show{display:flex}
+.edit-box{background:var(--surface);border:1px solid var(--border);border-radius:16px 16px 0 0;padding:1.25rem;width:100%;max-width:480px;max-height:80vh;overflow-y:auto}
+.edit-box h3{font-size:14px;font-weight:500;margin-bottom:4px}
+.edit-sub{font-size:12px;color:var(--muted);margin-bottom:1rem;font-family:var(--font-mono);word-break:break-all}
+.edit-fields{display:flex;flex-direction:column;gap:8px;margin-bottom:1rem}
+.efrow{display:flex;align-items:center;gap:8px}
+.efrow label{font-size:12px;color:var(--muted);min-width:64px;flex-shrink:0}
+.efrow input{flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:9px 10px;color:var(--text);font-family:var(--font-mono);font-size:13px;outline:none}
+.efrow input:focus{border-color:var(--accent)}
+.efrow input.qinput{border-color:rgba(0,229,160,0.3);color:var(--accent)}
+.eacts{display:flex;gap:8px}
+.eacts button{flex:1;padding:12px;border-radius:8px;border:none;font-size:14px;font-family:var(--font-main);cursor:pointer;font-weight:500}
+.ecancel{background:var(--surface2);color:var(--muted)}
+.esave{background:var(--accent);color:#000}
 
-  /* 수정 모달 (하단 시트) */
-  #edit-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:200;align-items:flex-end;justify-content:center}
-  #edit-modal.show{display:flex}
-  .edit-box{background:var(--surface);border:1px solid var(--border);border-radius:16px 16px 0 0;padding:1.25rem;width:100%;max-width:480px;max-height:80vh;overflow-y:auto}
-  .edit-box h3{font-size:14px;font-weight:500;margin-bottom:4px}
-  .edit-sub{font-size:12px;color:var(--muted);margin-bottom:1rem;font-family:var(--font-mono);word-break:break-all}
-  .edit-fields{display:flex;flex-direction:column;gap:8px;margin-bottom:1rem}
-  .edit-field-row{display:flex;align-items:center;gap:8px}
-  .edit-field-row label{font-size:12px;color:var(--muted);min-width:64px;flex-shrink:0}
-  .edit-field-row input{flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:9px 10px;color:var(--text);font-family:var(--font-mono);font-size:13px;outline:none}
-  .edit-field-row input:focus{border-color:var(--accent)}
-  .edit-field-row input.qty-input{border-color:rgba(0,229,160,0.3);color:var(--accent)}
-  .edit-actions{display:flex;gap:8px}
-  .edit-actions button{flex:1;padding:12px;border-radius:8px;border:none;font-size:14px;font-family:var(--font-main);cursor:pointer;font-weight:500}
-  .btn-edit-cancel{background:var(--surface2);color:var(--muted)}
-  .btn-edit-save{background:var(--accent);color:#000}
-
-  /* 삭제 확인 모달 */
-  #del-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:200;align-items:center;justify-content:center}
-  #del-modal.show{display:flex}
-
-  /* 초기화 확인 모달 */
-  #confirm-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:200;align-items:center;justify-content:center}
-  #confirm-modal.show{display:flex}
-  .modal-box{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:1.5rem;width:280px;text-align:center}
-  .modal-box h3{font-size:15px;font-weight:500;margin-bottom:8px}
-  .modal-box p{font-size:13px;color:var(--muted);margin-bottom:1.25rem;line-height:1.6}
-  .modal-btns{display:flex;gap:8px}
-  .modal-btns button{flex:1;padding:11px;border-radius:8px;border:none;font-size:14px;font-family:var(--font-main);cursor:pointer;font-weight:500}
-  .btn-no{background:var(--surface2);color:var(--muted)}
-  .btn-yes-del{background:var(--danger);color:#fff}
-  .btn-yes-reset{background:var(--danger);color:#fff}
-
-  .toast{position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%) translateY(20px);background:var(--surface2);border:1px solid var(--border);color:var(--text);font-size:13px;padding:10px 20px;border-radius:8px;opacity:0;transition:opacity 0.25s,transform 0.25s;pointer-events:none;white-space:nowrap;z-index:999}
-  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast{position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%) translateY(20px);background:var(--surface2);border:1px solid var(--border);color:var(--text);font-size:13px;padding:10px 20px;border-radius:8px;opacity:0;transition:opacity 0.25s,transform 0.25s;pointer-events:none;white-space:nowrap;z-index:999}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 </style>
 </head>
 <body>
 <div id="app">
-  <!-- 카메라 최상단 -->
-  <div id="scanner-wrap">
-    <div id="scanner-box">
-      <div id="reader"></div>
-      <div id="scan-overlay">
-        <div class="scan-frame">
-          <div class="scan-corner tl"></div>
-          <div class="scan-corner tr"></div>
-          <div class="scan-corner bl"></div>
-          <div class="scan-corner br"></div>
-          <div class="scan-line"></div>
+  <!-- 카메라 상단 고정 -->
+  <div id="cam-wrap">
+    <div id="cam-box">
+      <video id="cam-video" playsinline muted autoplay></video>
+      <div id="cam-placeholder">
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+        카메라 시작 버튼을 눌러주세요
+      </div>
+      <div id="scan-overlay" style="display:none">
+        <div class="s-frame">
+          <div class="s-corner tl"></div><div class="s-corner tr"></div>
+          <div class="s-corner bl"></div><div class="s-corner br"></div>
+          <div class="s-line"></div>
         </div>
       </div>
+      <div id="cam-status"></div>
     </div>
     <button id="cam-btn">카메라 시작</button>
   </div>
@@ -160,48 +156,50 @@
     <div class="count-badge" id="count-badge">0건</div>
   </header>
 
+  <!-- 수량 패널 -->
   <div id="result-panel">
-    <div class="panel-header"><div class="dot"></div><span class="panel-title">수량 확인 / 수정</span></div>
-    <div id="barcode-raw">—</div>
+    <div class="panel-hdr"><div class="panel-dot"></div><span class="panel-ttl">수량 확인 / 수정</span></div>
+    <div id="bc-raw">—</div>
     <div id="fields-preview"></div>
     <div class="calc-wrap">
-      <div class="calc-display">
+      <div class="calc-disp">
         <div class="calc-hint" id="calc-hint"></div>
         <div class="calc-expr" id="calc-expr"></div>
-        <div class="calc-result" id="calc-result">1</div>
+        <div class="calc-num" id="calc-num">1</div>
       </div>
       <div class="calc-grid">
-        <button class="calc-btn action" data-action="clear">C</button>
-        <button class="calc-btn action" data-action="back">⌫</button>
-        <button class="calc-btn op" data-val="%">%</button>
-        <button class="calc-btn op" data-val="/">÷</button>
-        <button class="calc-btn" data-val="7">7</button>
-        <button class="calc-btn" data-val="8">8</button>
-        <button class="calc-btn" data-val="9">9</button>
-        <button class="calc-btn op" data-val="*">×</button>
-        <button class="calc-btn" data-val="4">4</button>
-        <button class="calc-btn" data-val="5">5</button>
-        <button class="calc-btn" data-val="6">6</button>
-        <button class="calc-btn op" data-val="-">−</button>
-        <button class="calc-btn" data-val="1">1</button>
-        <button class="calc-btn" data-val="2">2</button>
-        <button class="calc-btn" data-val="3">3</button>
-        <button class="calc-btn op" data-val="+">+</button>
-        <button class="calc-btn zero" data-val="0">0</button>
-        <button class="calc-btn" data-val=".">.</button>
-        <button class="calc-btn save" id="save-btn">저장</button>
-        <button class="calc-btn cancel" data-action="cancel" style="grid-column:span 4">취소</button>
+        <button class="cb act" data-action="clear">C</button>
+        <button class="cb act" data-action="back">⌫</button>
+        <button class="cb op" data-val="%">%</button>
+        <button class="cb op" data-val="/">÷</button>
+        <button class="cb" data-val="7">7</button>
+        <button class="cb" data-val="8">8</button>
+        <button class="cb" data-val="9">9</button>
+        <button class="cb op" data-val="*">×</button>
+        <button class="cb" data-val="4">4</button>
+        <button class="cb" data-val="5">5</button>
+        <button class="cb" data-val="6">6</button>
+        <button class="cb op" data-val="-">−</button>
+        <button class="cb" data-val="1">1</button>
+        <button class="cb" data-val="2">2</button>
+        <button class="cb" data-val="3">3</button>
+        <button class="cb op" data-val="+">+</button>
+        <button class="cb zero" data-val="0">0</button>
+        <button class="cb" data-val=".">.</button>
+        <button class="cb save" id="save-btn">저장</button>
+        <button class="cb cancel" data-action="cancel" style="grid-column:span 4">취소</button>
       </div>
     </div>
   </div>
 
+  <!-- 목록 -->
   <div id="list-section">
-    <div class="list-header">
+    <div class="list-hdr">
       <span>스캔 기록</span>
-      <div class="header-btns">
-        <button class="export-btn" id="csv-btn">CSV</button>
-        <button class="export-btn" id="xlsx-btn">엑셀</button>
-        <button class="reset-btn" id="reset-btn">초기화</button>
+      <div class="hbtns">
+        <button class="ebtn" id="csv-btn">CSV</button>
+        <button class="ebtn" id="xlsx-btn">엑셀</button>
+        <button class="rbtn" id="reset-btn">초기화</button>
       </div>
     </div>
     <div id="table-wrap"></div>
@@ -212,35 +210,35 @@
 <div id="edit-modal">
   <div class="edit-box">
     <h3>항목 수정</h3>
-    <div class="edit-sub" id="edit-barcode-raw"></div>
+    <div class="edit-sub" id="edit-bc"></div>
     <div class="edit-fields" id="edit-fields"></div>
-    <div class="edit-actions">
-      <button class="btn-edit-cancel" id="edit-cancel">취소</button>
-      <button class="btn-edit-save" id="edit-save">저장</button>
+    <div class="eacts">
+      <button class="ecancel" id="edit-cancel">취소</button>
+      <button class="esave" id="edit-save">저장</button>
     </div>
   </div>
 </div>
 
-<!-- 삭제 확인 모달 -->
-<div id="del-modal">
-  <div class="modal-box">
+<!-- 삭제 확인 -->
+<div class="modal-bg" id="del-modal">
+  <div class="mbox">
     <h3>삭제 확인</h3>
     <p>이 항목을 삭제할까요?<br>삭제 후 복구할 수 없습니다.</p>
-    <div class="modal-btns">
-      <button class="btn-no" id="del-cancel">취소</button>
-      <button class="btn-yes-del" id="del-ok">삭제</button>
+    <div class="mbtns">
+      <button class="bno" id="del-cancel">취소</button>
+      <button class="bdanger" id="del-ok">삭제</button>
     </div>
   </div>
 </div>
 
-<!-- 초기화 확인 모달 -->
-<div id="confirm-modal">
-  <div class="modal-box">
+<!-- 초기화 확인 -->
+<div class="modal-bg" id="reset-modal">
+  <div class="mbox">
     <h3>전체 초기화</h3>
     <p>저장된 모든 스캔 기록이<br>삭제됩니다. 계속할까요?</p>
-    <div class="modal-btns">
-      <button class="btn-no" id="modal-cancel">취소</button>
-      <button class="btn-yes-reset" id="modal-ok">삭제</button>
+    <div class="mbtns">
+      <button class="bno" id="reset-cancel">취소</button>
+      <button class="bdanger" id="reset-ok">삭제</button>
     </div>
   </div>
 </div>
@@ -250,80 +248,71 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 <script>
-const STORAGE_KEY='barcode_records_v3';
+const STORAGE_KEY='barcode_v4';
 let records=[];
-let scanner=null,scanning=false,lastCode='',lastTime=0;
-let expr='';
-let defaultQty=1;
-let editingIdx=-1;
-let deletingIdx=-1;
+let scanner=null, scanning=false;
+let lastCode='', lastTime=0;
+let expr='', defaultQty=1;
+let editingIdx=-1, deletingIdx=-1;
 
-function saveToStorage(){try{localStorage.setItem(STORAGE_KEY,JSON.stringify(records));}catch(e){}}
-function loadFromStorage(){
+// ── 스토리지 ──
+function save(){try{localStorage.setItem(STORAGE_KEY,JSON.stringify(records));}catch(e){}}
+function load(){
   try{
-    for(const k of[STORAGE_KEY,'barcode_records_v2','barcode_records_v1']){
+    for(const k of[STORAGE_KEY,'barcode_records_v3','barcode_records_v2','barcode_records_v1']){
       const d=localStorage.getItem(k);
       if(d){records=JSON.parse(d);break;}
     }
-    records=records.map(r=>{
-      if(!r.fields)r.fields=splitBarcode(r.barcode||'');
-      return r;
-    });
+    records=records.map(r=>{if(!r.fields)r.fields=splitBC(r.barcode||'');return r;});
   }catch(e){records=[];}
 }
 
-const camBtn=document.getElementById('cam-btn');
-const resultPanel=document.getElementById('result-panel');
-const barcodeRawEl=document.getElementById('barcode-raw');
-const fieldsPreview=document.getElementById('fields-preview');
-const calcExprEl=document.getElementById('calc-expr');
-const calcResultEl=document.getElementById('calc-result');
-const calcHint=document.getElementById('calc-hint');
-const countBadge=document.getElementById('count-badge');
-const tableWrap=document.getElementById('table-wrap');
-const toast=document.getElementById('toast');
-const confirmModal=document.getElementById('confirm-modal');
-const editModal=document.getElementById('edit-modal');
-const delModal=document.getElementById('del-modal');
-
-function showToast(msg){toast.textContent=msg;toast.classList.add('show');clearTimeout(toast._t);toast._t=setTimeout(()=>toast.classList.remove('show'),2000);}
+// ── 유틸 ──
+function toast(msg){
+  const el=document.getElementById('toast');
+  el.textContent=msg;el.classList.add('show');
+  clearTimeout(el._t);el._t=setTimeout(()=>el.classList.remove('show'),2000);
+}
 function fmt(d){const p=n=>String(n).padStart(2,'0');return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}:${p(d.getSeconds())}`;}
+function vibrate(){try{navigator.vibrate&&navigator.vibrate(120);}catch(e){}}
 
-function splitBarcode(code){
-  // 빈값 유지로 열 순서 보장
-  return code.split('/').map(s=>s.trim());
-}
-function extractQty(fields){
-  if(fields.length>=3){const v=parseFloat(fields[2]);if(!isNaN(v)&&v>0)return v;}
-  return 1;
-}
-function evalExpr(e){
+// 빈값 유지 — 열 순서 보장
+function splitBC(code){return code.split('/').map(s=>s.trim());}
+function extractQty(fields){if(fields.length>=3){const v=parseFloat(fields[2]);if(!isNaN(v)&&v>0)return v;}return 1;}
+
+// ── 계산기 ──
+function evalE(e){
   try{
-    const clean=e.replace(/×/g,'*').replace(/÷/g,'/').replace(/−/g,'-');
-    const r=Function('"use strict";return ('+clean+')')();
-    if(!isFinite(r)||isNaN(r))return null;
-    return Math.round(r*1000)/1000;
-  }catch(err){return null;}
+    const c=e.replace(/×/g,'*').replace(/÷/g,'/').replace(/−/g,'-');
+    const r=Function('"use strict";return('+c+')')();
+    return isFinite(r)&&!isNaN(r)?Math.round(r*1000)/1000:null;
+  }catch(e){return null;}
 }
 function updateCalc(){
-  if(!expr){calcExprEl.textContent='';calcResultEl.textContent=defaultQty;calcResultEl.className='calc-result';return;}
-  calcExprEl.textContent=expr.replace(/\*/g,'×').replace(/\//g,'÷');
-  const r=evalExpr(expr);
-  if(r!==null){calcResultEl.textContent=r;calcResultEl.className='calc-result';}
-  else{calcResultEl.textContent='오류';calcResultEl.className='calc-result error';}
+  const exprEl=document.getElementById('calc-expr');
+  const numEl=document.getElementById('calc-num');
+  if(!expr){exprEl.textContent='';numEl.textContent=defaultQty;numEl.className='calc-num';return;}
+  exprEl.textContent=expr.replace(/\*/g,'×').replace(/\//g,'÷');
+  const r=evalE(expr);
+  if(r!==null){numEl.textContent=r;numEl.className='calc-num';}
+  else{numEl.textContent='오류';numEl.className='calc-num err';}
 }
 function getFinalQty(){
   if(!expr)return defaultQty;
-  const r=evalExpr(expr);
+  const r=evalE(expr);
   return(r!==null&&r>0)?Math.round(r):null;
 }
 
 document.querySelector('.calc-grid').addEventListener('click',e=>{
-  const btn=e.target.closest('.calc-btn');if(!btn)return;
+  const btn=e.target.closest('.cb');if(!btn)return;
   const action=btn.dataset.action,val=btn.dataset.val;
   if(action==='clear'){expr='';updateCalc();}
   else if(action==='back'){expr=expr.slice(0,-1);updateCalc();}
-  else if(action==='cancel'){resultPanel.style.display='none';expr='';}
+  else if(action==='cancel'){
+    document.getElementById('result-panel').style.display='none';
+    expr='';
+    window.scrollTo({top:0,behavior:'smooth'});
+  }
   else if(val!==undefined){
     const ops=['+','-','*','/','%'];
     if(ops.includes(val)&&ops.includes(expr.slice(-1)))expr=expr.slice(0,-1);
@@ -333,163 +322,211 @@ document.querySelector('.calc-grid').addEventListener('click',e=>{
 
 document.getElementById('save-btn').addEventListener('click',()=>{
   const qty=getFinalQty();
-  if(qty===null){showToast('올바른 수량을 입력해주세요');return;}
-  const code=barcodeRawEl.textContent;
-  const fields=splitBarcode(code);
+  if(qty===null){toast('올바른 수량을 입력해주세요');return;}
+  const code=document.getElementById('bc-raw').textContent;
+  const fields=splitBC(code);
   while(fields.length<3)fields.push('');
   fields[2]=String(qty);
   records.push({barcode:code,fields,datetime:fmt(new Date()),qty});
-  saveToStorage();
-  resultPanel.style.display='none';
+  save();
+  document.getElementById('result-panel').style.display='none';
   expr='';
-  renderList();showToast('저장되었습니다');
+  renderList();
+  toast('저장되었습니다');
   window.scrollTo({top:0,behavior:'smooth'});
 });
 
-// ── 수정 모달 ──
-function openEditModal(idx){
-  editingIdx=idx;
-  const r=records[idx];
-  document.getElementById('edit-barcode-raw').textContent=r.barcode;
-  const container=document.getElementById('edit-fields');
-  container.innerHTML='';
-  r.fields.forEach((f,i)=>{
-    const row=document.createElement('div');row.className='edit-field-row';
-    const label=document.createElement('label');
-    label.textContent=i===2?'수량':`항목 ${i+1}`;
-    const input=document.createElement('input');
-    input.type='text';
-    input.value=f;
-    input.dataset.fieldIdx=String(i);
-    if(i===2)input.className='qty-input';
-    row.appendChild(label);row.appendChild(input);
-    container.appendChild(row);
-  });
-  editModal.classList.add('show');
+// ── 카메라 ──
+function setStatus(msg){document.getElementById('cam-status').textContent=msg;}
+
+async function startCamera(){
+  if(scanning)return;
+  if(!scanner)scanner=new Html5Qrcode('cam-reader-hidden');
+  try{
+    const constraints={
+      facingMode:'environment',
+      width:{ideal:1280},
+      height:{ideal:720}
+    };
+    const stream=await navigator.mediaDevices.getUserMedia({video:constraints,audio:false});
+    const video=document.getElementById('cam-video');
+    video.srcObject=stream;
+    await video.play();
+    document.getElementById('cam-placeholder').style.display='none';
+    document.getElementById('scan-overlay').style.display='flex';
+
+    // html5-qrcode로 인식 (더 넓은 인식 범위)
+    await scanner.start(
+      {facingMode:'environment'},
+      {
+        fps:15,
+        qrbox:{width:280,height:280},
+        aspectRatio:1.777,
+        disableFlip:false,
+        experimentalFeatures:{useBarCodeDetectorIfSupported:true}
+      },
+      onDetected,
+      ()=>{}
+    );
+    scanning=true;
+    const camBtn=document.getElementById('cam-btn');
+    camBtn.textContent='스캔 중지';camBtn.classList.add('on');
+    setStatus('바코드를 프레임에 맞춰주세요');
+  }catch(err){
+    toast('카메라 권한을 허용해주세요');
+    setStatus('카메라 권한 필요');
+  }
 }
 
-document.getElementById('edit-cancel').addEventListener('click',()=>editModal.classList.remove('show'));
-
-document.getElementById('edit-save').addEventListener('click',()=>{
-  const r=records[editingIdx];
-  const inputs=document.querySelectorAll('#edit-fields input');
-  inputs.forEach(inp=>{
-    const fi=parseInt(inp.dataset.fieldIdx);
-    r.fields[fi]=inp.value.trim();
-  });
-  const qtyVal=parseFloat(r.fields[2]);
-  r.qty=(!isNaN(qtyVal)&&qtyVal>0)?qtyVal:1;
-  saveToStorage();
-  renderList();
-  editModal.classList.remove('show');
-  showToast('수정되었습니다');
-});
-
-// ── 삭제 확인 모달 ──
-document.getElementById('del-cancel').addEventListener('click',()=>delModal.classList.remove('show'));
-document.getElementById('del-ok').addEventListener('click',()=>{
-  if(deletingIdx>=0){
-    records.splice(deletingIdx,1);
-    saveToStorage();renderList();
-    showToast('삭제되었습니다');
+async function stopCamera(){
+  if(scanner&&scanning){
+    try{await scanner.stop();}catch(e){}
   }
-  delModal.classList.remove('show');
-  deletingIdx=-1;
-});
-
-function getMaxCols(){let m=0;records.forEach(r=>{if(r.fields&&r.fields.length>m)m=r.fields.length;});return m;}
-
-function renderList(){
-  countBadge.textContent=records.length+'건';
-  if(!records.length){
-    tableWrap.innerHTML='<div style="padding:3rem 0;text-align:center;color:var(--muted);font-size:13px;line-height:2">아직 스캔된 항목이 없습니다</div>';
-    return;
-  }
-  const maxCols=getMaxCols();
-  let html='<table><thead><tr><th>날짜/시간</th>';
-  for(let i=0;i<maxCols;i++)html+=`<th>${i===2?'수량':'항목'+(i+1)}</th>`;
-  html+='<th>관리</th></tr></thead><tbody>';
-  [...records].reverse().forEach((r,ri)=>{
-    const idx=records.length-1-ri;
-    html+=`<tr><td class="td-mono" style="white-space:nowrap;font-size:11px">${r.datetime}</td>`;
-    for(let c=0;c<maxCols;c++){
-      const val=r.fields&&r.fields[c]!==undefined?r.fields[c]:'';
-      html+=c===2?`<td class="td-qty">${val}</td>`:`<td class="td-mono">${val}</td>`;
-    }
-    html+=`<td><div class="td-actions"><button class="btn-edit" data-i="${idx}">수정</button><button class="btn-del" data-i="${idx}">삭제</button></div></td></tr>`;
-  });
-  html+='</tbody></table>';
-  tableWrap.innerHTML=html;
-  tableWrap.querySelectorAll('.btn-edit').forEach(b=>b.addEventListener('click',()=>openEditModal(+b.dataset.i)));
-  tableWrap.querySelectorAll('.btn-del').forEach(b=>b.addEventListener('click',()=>{
-    deletingIdx=+b.dataset.i;
-    delModal.classList.add('show');
-  }));
+  const video=document.getElementById('cam-video');
+  if(video.srcObject)video.srcObject.getTracks().forEach(t=>t.stop());
+  video.srcObject=null;
+  scanning=false;
+  document.getElementById('cam-placeholder').style.display='flex';
+  document.getElementById('scan-overlay').style.display='none';
+  const camBtn=document.getElementById('cam-btn');
+  camBtn.textContent='카메라 시작';camBtn.classList.remove('on');
+  setStatus('');
 }
+
+document.getElementById('cam-btn').addEventListener('click',()=>{
+  if(!scanning)startCamera();else stopCamera();
+});
 
 function onDetected(code){
   const now=Date.now();
   if(code===lastCode&&now-lastTime<3000)return;
   lastCode=code;lastTime=now;
-  if(navigator.vibrate)navigator.vibrate(100);
-  const fields=splitBarcode(code);
+  vibrate();
+  const fields=splitBC(code);
   defaultQty=extractQty(fields);
-  barcodeRawEl.textContent=code;
-  fieldsPreview.innerHTML=fields.map((f,i)=>`<span class="field-chip${i===2?' qty-chip':''}"><span class="field-num">${i+1}</span>${f}</span>`).join('');
-  calcHint.textContent=fields.length>=3?`바코드 수량: ${defaultQty} (그대로 저장하거나 수정)`:'수량 없음 → 기본값 1';
+  document.getElementById('bc-raw').textContent=code;
+  document.getElementById('fields-preview').innerHTML=
+    fields.map((f,i)=>`<span class="fchip${i===2?' qty':''}"><span class="fnum">${i+1}</span>${f}</span>`).join('');
+  document.getElementById('calc-hint').textContent=
+    fields.length>=3?`바코드 수량: ${defaultQty} (수정하려면 숫자 입력)`:'수량 없음 → 기본값 1';
   expr='';updateCalc();
-  resultPanel.style.display='block';
-  setTimeout(()=>resultPanel.scrollIntoView({behavior:'smooth',block:'start'}),50);
+  const panel=document.getElementById('result-panel');
+  panel.style.display='block';
+  setTimeout(()=>panel.scrollIntoView({behavior:'smooth',block:'start'}),80);
+  setStatus('인식 완료! 수량을 확인하세요');
 }
 
-async function startCamera(){
-  if(!scanner)scanner=new Html5Qrcode('reader');
-  try{
-    await scanner.start({facingMode:'environment'},{fps:15,qrbox:{width:220,height:220}},onDetected,()=>{});
-    scanning=true;camBtn.textContent='스캔 중지';camBtn.classList.add('stop');
-  }catch(e){showToast('카메라 권한이 필요합니다');}
+// ── 수정 모달 ──
+function openEdit(idx){
+  editingIdx=idx;
+  const r=records[idx];
+  document.getElementById('edit-bc').textContent=r.barcode;
+  const container=document.getElementById('edit-fields');
+  container.innerHTML='';
+  r.fields.forEach((f,i)=>{
+    const row=document.createElement('div');row.className='efrow';
+    const label=document.createElement('label');label.textContent=i===2?'수량':`항목 ${i+1}`;
+    const input=document.createElement('input');
+    input.type='text';input.value=f;input.dataset.fi=String(i);
+    if(i===2)input.className='qinput';
+    row.appendChild(label);row.appendChild(input);
+    container.appendChild(row);
+  });
+  document.getElementById('edit-modal').classList.add('show');
 }
-async function stopCamera(){
-  if(scanner&&scanning){try{await scanner.stop();}catch(e){}}
-  scanning=false;camBtn.textContent='카메라 시작';camBtn.classList.remove('stop');
-}
-camBtn.addEventListener('click',async()=>{if(!scanning)await startCamera();else await stopCamera();});
-
-document.getElementById('reset-btn').addEventListener('click',()=>confirmModal.classList.add('show'));
-document.getElementById('modal-cancel').addEventListener('click',()=>confirmModal.classList.remove('show'));
-document.getElementById('modal-ok').addEventListener('click',()=>{
-  records=[];saveToStorage();renderList();
-  confirmModal.classList.remove('show');showToast('초기화되었습니다');
+document.getElementById('edit-cancel').addEventListener('click',()=>document.getElementById('edit-modal').classList.remove('show'));
+document.getElementById('edit-save').addEventListener('click',()=>{
+  const r=records[editingIdx];
+  document.querySelectorAll('#edit-fields input').forEach(inp=>{r.fields[+inp.dataset.fi]=inp.value.trim();});
+  const qv=parseFloat(r.fields[2]);
+  r.qty=(!isNaN(qv)&&qv>0)?qv:1;
+  save();renderList();
+  document.getElementById('edit-modal').classList.remove('show');
+  toast('수정되었습니다');
 });
 
-function buildExportRows(){
-  const maxCols=getMaxCols();
-  const headers=['날짜/시간',...Array.from({length:maxCols},(_,i)=>i===2?'수량':`항목${i+1}`)];
+// ── 삭제 모달 ──
+document.getElementById('del-cancel').addEventListener('click',()=>document.getElementById('del-modal').classList.remove('show'));
+document.getElementById('del-ok').addEventListener('click',()=>{
+  if(deletingIdx>=0){records.splice(deletingIdx,1);save();renderList();toast('삭제되었습니다');}
+  document.getElementById('del-modal').classList.remove('show');deletingIdx=-1;
+});
+
+// ── 초기화 모달 ──
+document.getElementById('reset-btn').addEventListener('click',()=>document.getElementById('reset-modal').classList.add('show'));
+document.getElementById('reset-cancel').addEventListener('click',()=>document.getElementById('reset-modal').classList.remove('show'));
+document.getElementById('reset-ok').addEventListener('click',()=>{
+  records=[];save();renderList();
+  document.getElementById('reset-modal').classList.remove('show');toast('초기화되었습니다');
+});
+
+// ── 렌더링 ──
+function getMaxCols(){let m=0;records.forEach(r=>{if(r.fields&&r.fields.length>m)m=r.fields.length;});return m;}
+function renderList(){
+  document.getElementById('count-badge').textContent=records.length+'건';
+  const wrap=document.getElementById('table-wrap');
+  if(!records.length){
+    wrap.innerHTML='<div style="padding:3rem 0;text-align:center;color:var(--muted);font-size:13px;line-height:2">아직 스캔된 항목이 없습니다</div>';
+    return;
+  }
+  const mc=getMaxCols();
+  let html='<table><thead><tr><th>날짜/시간</th>';
+  for(let i=0;i<mc;i++)html+=`<th>${i===2?'수량':'항목'+(i+1)}</th>`;
+  html+='<th>관리</th></tr></thead><tbody>';
+  [...records].reverse().forEach((r,ri)=>{
+    const idx=records.length-1-ri;
+    html+=`<tr><td class="tm" style="white-space:nowrap;font-size:11px">${r.datetime}</td>`;
+    for(let c=0;c<mc;c++){
+      const v=r.fields&&r.fields[c]!==undefined?r.fields[c]:'';
+      html+=c===2?`<td class="tq">${v}</td>`:`<td class="tm">${v}</td>`;
+    }
+    html+=`<td><div class="tact"><button class="bedit" data-i="${idx}">수정</button><button class="bdel" data-i="${idx}">삭제</button></div></td></tr>`;
+  });
+  html+='</tbody></table>';
+  wrap.innerHTML=html;
+  wrap.querySelectorAll('.bedit').forEach(b=>b.addEventListener('click',()=>openEdit(+b.dataset.i)));
+  wrap.querySelectorAll('.bdel').forEach(b=>b.addEventListener('click',()=>{
+    deletingIdx=+b.dataset.i;
+    document.getElementById('del-modal').classList.add('show');
+  }));
+}
+
+// ── 내보내기 ──
+function buildRows(){
+  const mc=getMaxCols();
+  const headers=['날짜/시간',...Array.from({length:mc},(_,i)=>i===2?'수량':`항목${i+1}`)];
   const rows=records.map(r=>{
     const row={'날짜/시간':r.datetime};
-    for(let i=0;i<maxCols;i++)row[i===2?'수량':`항목${i+1}`]=r.fields&&r.fields[i]!==undefined?r.fields[i]:'';
+    for(let i=0;i<mc;i++)row[i===2?'수량':`항목${i+1}`]=r.fields&&r.fields[i]!==undefined?r.fields[i]:'';
     return row;
   });
   return{headers,rows};
 }
 document.getElementById('csv-btn').addEventListener('click',()=>{
-  if(!records.length){showToast('저장할 데이터가 없습니다');return;}
-  const{headers,rows}=buildExportRows();
+  if(!records.length){toast('저장할 데이터가 없습니다');return;}
+  const{headers,rows}=buildRows();
   const lines=['\uFEFF'+headers.join(','),...rows.map(r=>headers.map(h=>'"'+(r[h]||'')+'"').join(','))];
   const blob=new Blob([lines.join('\n')],{type:'text/csv;charset=utf-8'});
   const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`scan_${new Date().toISOString().slice(0,10)}.csv`;a.click();
 });
 document.getElementById('xlsx-btn').addEventListener('click',()=>{
-  if(!records.length){showToast('저장할 데이터가 없습니다');return;}
-  const{rows}=buildExportRows();
+  if(!records.length){toast('저장할 데이터가 없습니다');return;}
+  const{rows}=buildRows();
   const ws=XLSX.utils.json_to_sheet(rows);
   const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'스캔기록');
   XLSX.writeFile(wb,`scan_${new Date().toISOString().slice(0,10)}.xlsx`);
 });
 
-loadFromStorage();
+// html5-qrcode 내부 div (숨김)
+const hiddenDiv=document.createElement('div');
+hiddenDiv.id='cam-reader-hidden';
+hiddenDiv.style.display='none';
+document.body.appendChild(hiddenDiv);
+
+// ── 시작 ──
+load();
 renderList();
-// 앱 시작시 자동 카메라 시작
+// 자동 카메라 시작
 startCamera();
 </script>
 </body>
