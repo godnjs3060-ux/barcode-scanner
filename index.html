@@ -45,21 +45,21 @@
 
   /* 수량 패널 */
   #rp-backdrop{display:none}
-  #rp{display:none;position:fixed;bottom:0;left:0;right:0;background:var(--surface);border-top:2px solid var(--border);border-radius:16px 16px 0 0;z-index:50;overflow:hidden;padding-bottom:env(safe-area-inset-bottom)}
+  #rp{display:none;position:fixed;bottom:0;left:0;right:0;background:var(--surface);border-top:2px solid var(--accent);border-radius:16px 16px 0 0;z-index:50;overflow:hidden;padding-bottom:env(safe-area-inset-bottom,8px)}
   #rp.show{display:block!important}
-  .rph{padding:4px 9px;border-bottom:1px solid var(--border);font-size:11px;color:var(--muted)}
-  #fp{display:flex;flex-wrap:wrap;gap:3px;padding:4px 7px}
-  .chip{background:var(--surface2);color:var(--text);font-size:11px;padding:2px 7px;border-radius:5px;border:1px solid var(--border);font-family:var(--mono)}
+  .rph{padding:4px 9px;border-bottom:1px solid var(--border);font-size:10px;color:var(--muted)}
+  #fp{display:flex;flex-wrap:wrap;gap:3px;padding:3px 7px}
+  .chip{background:var(--surface2);color:var(--text);font-size:10px;padding:1px 5px;border-radius:4px;border:1px solid var(--border);font-family:var(--mono)}
   .chip.q{background:var(--accent-dim);color:var(--accent);border-color:transparent}
   .cnum{font-size:9px;color:var(--muted);margin-right:2px}
-  .cw{padding:5px 7px 7px}
-  .cd{background:var(--surface2);border-radius:8px;padding:4px 12px;margin-bottom:4px;text-align:right}
-  .chint{font-size:10px;color:var(--muted)}
-  .cexpr{font-size:11px;color:var(--muted);font-family:var(--mono);min-height:14px}
-  .cval{font-size:18px;font-weight:500;font-family:var(--mono)}
+  .cw{padding:4px 6px 6px}
+  .cd{background:var(--surface2);border-radius:6px;padding:3px 10px;margin-bottom:3px;text-align:right}
+  .chint{font-size:10px;color:var(--muted);line-height:1.2}
+  .cexpr{font-size:10px;color:var(--muted);font-family:var(--mono);min-height:12px}
+  .cval{font-size:16px;font-weight:500;font-family:var(--mono)}
   .cval.err{color:var(--danger);font-size:14px}
   .cgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:3px}
-  .cb{padding:9px 0;border:none;border-radius:7px;font-size:14px;font-weight:500;cursor:pointer;background:var(--surface2);color:var(--text);font-family:var(--mono)}
+  .cb{padding:8px 0;border:none;border-radius:6px;font-size:13px;font-weight:500;cursor:pointer;background:var(--surface2);color:var(--text);font-family:var(--mono)}
   .cb:active{opacity:.7;transform:scale(.96)}
   .cb.op{background:#1e2e28;color:var(--accent)}
   .cb.act{background:#1a1a2e;color:#7b8cde;font-size:13px;font-family:var(--font)}
