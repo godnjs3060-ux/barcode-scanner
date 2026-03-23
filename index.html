@@ -208,7 +208,7 @@ let records=[],expr='',defQty=1,editIdx=-1,delIdx=-1,currentCode='';
 let stream=null,raf=null,scanning=false,detector=null,lastCode='',lastTime=0;
 
 // storage
-function save(){try{localStorage.setItem(SK,JSON.stringify(records));}catch(e){}}
+function save(){try{localStorage.setItem(SK,JSON.stringify(records));localStorage.setItem('barcode_records_v3',JSON.stringify(records));}catch(e){}}
 function load(){
   try{
     for(const k of[SK,'barcode_records_v3','barcode_records_v2','barcode_records_v1']){
@@ -292,7 +292,7 @@ function onDetected(code){
   chint.textContent=fields.length>=3?`바코드 수량: ${defQty}`:'기본값 1';
   expr='';updCalc();
   rp.style.display='block';
-  setTimeout(()=>rp.scrollIntoView({behavior:'smooth',block:'start'}),60);
+  setTimeout(()=>{const camH=document.getElementById('cam-wrap').offsetHeight;window.scrollTo({top:camH,behavior:'smooth'});},60);
 }
 
 // BarcodeDetector 기반 스캔 루프
