@@ -119,7 +119,7 @@
   <div id="cam-wrap">
     <div id="cam-box">
       <video id="vid" playsinline muted autoplay></video>
-      <canvas id="scan-canvas" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none"></canvas>
+      <canvas id="scan-canvas" style="position:absolute;top:0;left:0;width:100%;height:200px;pointer-events:none"></canvas>
       <div id="overlay">
         <div class="frame-box">
           <div class="corner tl"></div><div class="corner tr"></div>
@@ -318,20 +318,24 @@ function drawLoop(){
   if(!scanning)return;
   const canvas=document.getElementById('scan-canvas');
   const ctx=canvas.getContext('2d');
-  if(vid.videoWidth>0){
-    canvas.width=vid.videoWidth;
-    canvas.height=vid.videoHeight;
-    ctx.clearRect(0,0,canvas.width,canvas.height);
+  const dw=vid.offsetWidth||canvas.offsetWidth;
+  const dh=vid.offsetHeight||canvas.offsetHeight;
+  canvas.width=dw;
+  canvas.height=dh;
+  ctx.clearRect(0,0,dw,dh);
+  if(lastResults.length>0&&vid.videoWidth>0){
+    const scaleX=dw/vid.videoWidth;
+    const scaleY=dh/vid.videoHeight;
     lastResults.forEach((r,i)=>{
       const pts=r.cornerPoints;
       ctx.beginPath();
-      ctx.moveTo(pts[0].x,pts[0].y);
-      pts.forEach(p=>ctx.lineTo(p.x,p.y));
+      ctx.moveTo(pts[0].x*scaleX,pts[0].y*scaleY);
+      pts.forEach(p=>ctx.lineTo(p.x*scaleX,p.y*scaleY));
       ctx.closePath();
       ctx.strokeStyle=i===0?'#00e5a0':'#ffffff';
-      ctx.lineWidth=4;
+      ctx.lineWidth=3;
       ctx.stroke();
-      ctx.fillStyle=i===0?'rgba(0,229,160,0.2)':'rgba(255,255,255,0.1)';
+      ctx.fillStyle=i===0?'rgba(0,229,160,0.2)':'rgba(255,255,255,0.12)';
       ctx.fill();
     });
   }
