@@ -3,15 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>바코드 스캐너 PRO++</title>
+<title>바코드 스캐너</title>
 
 <style>
 body{margin:0;font-family:sans-serif;background:#111;color:#fff}
-#video{width:100%;height:220px;object-fit:cover;background:#000}
+#video{width:100%;height:250px;object-fit:cover;background:#000}
 #controls{padding:10px}
 button{padding:10px;margin:5px;border:none;border-radius:6px;cursor:pointer}
 #start{background:#00e5a0;color:#000}
-#export{background:#333;color:#fff}
 #reset{background:#ff4d4d;color:#fff}
 input,select{padding:8px;border-radius:6px;border:none;margin:5px}
 #list{padding:10px}
@@ -27,6 +26,7 @@ input,select{padding:8px;border-radius:6px;border:none;margin:5px}
 <div id="controls">
 
   <input id="worker" placeholder="작업자 이름">
+  
   <select id="mode">
     <option value="sum">누적</option>
     <option value="single">단건</option>
@@ -36,8 +36,6 @@ input,select{padding:8px;border-radius:6px;border:none;margin:5px}
   <br>
 
   <button id="start">스캔 시작</button>
-  <button id="export">CSV</button>
-  <button id="xlsx">엑셀</button>
   <button id="downloadLocal">저장+공유</button>
   <button id="reset">초기화</button>
 
@@ -58,7 +56,7 @@ let detector, stream;
 let lastScan="", lastTime=0;
 let records = JSON.parse(localStorage.getItem('records')||'[]');
 
-// 작업자 자동 저장
+// 작업자 유지
 const savedWorker = localStorage.getItem('worker');
 if(savedWorker){
   window.addEventListener('DOMContentLoaded',()=>{
@@ -128,47 +126,50 @@ function addRecord(code,qty=1){
   save(); render();
 }
 
+// 🔥 카메라 안정 버전 (검은화면 해결)
 async function start(){
-  if(!('BarcodeDetector' in window)) return alert('크롬 사용');
-  detector=new BarcodeDetector();
-  stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'}});
-  video.srcObject=stream;
-  scan();
+  try{
+    const video = document.getElementById('video');
+
+    stream = await navigator.mediaDevices.getUserMedia({
+      video:{
+        facingMode: { ideal: 'environment' },
+        width: { ideal: 1280 },
+        height: { ideal: 720 }
+      },
+      audio:false
+    });
+
+    video.srcObject = stream;
+    video.setAttribute('playsinline', true);
+    video.muted = true;
+    await video.play();
+
+    detector = new BarcodeDetector();
+
+    scan();
+
+  }catch(e){
+    alert('카메라 오류: ' + e.message);
+  }
 }
 
 async function scan(){
   const v=document.getElementById('video');
   if(v.readyState===v.HAVE_ENOUGH_DATA){
-    const b=await detector.detect(v);
-    if(b.length){
-      const code=b[0].rawValue;
-      const now=Date.now();
-      if(code!==lastScan||now-lastTime>1500){
-        lastScan=code; lastTime=now;
-        addRecord(code,1);
+    try{
+      const b=await detector.detect(v);
+      if(b.length){
+        const code=b[0].rawValue;
+        const now=Date.now();
+        if(code!==lastScan||now-lastTime>1500){
+          lastScan=code; lastTime=now;
+          addRecord(code,1);
+        }
       }
-    }
+    }catch(e){}
   }
   requestAnimationFrame(scan);
-}
-
-// CSV
-function exportCSV(){
-  let csv='code,qty,time,worker\n';
-  records.forEach(r=>csv+=`${r.code},${r.qty},${r.time},${r.worker}\n`);
-  const blob=new Blob([csv],{type:'text/csv'});
-  const a=document.createElement('a');
-  a.href=URL.createObjectURL(blob);
-  a.download=fileName()+'.csv';
-  a.click();
-}
-
-// XLSX
-function exportXLSX(){
-  const ws=XLSX.utils.json_to_sheet(records);
-  const wb=XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb,ws,'data');
-  XLSX.writeFile(wb,fileName()+'.xlsx');
 }
 
 // 저장 + 공유
@@ -176,13 +177,11 @@ async function saveAndShare(){
   const blob = new Blob([JSON.stringify(records)], {type:'application/json'});
   const filename = fileName()+'.json';
 
-  // 파일 저장
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
   a.download = filename;
   a.click();
 
-  // 공유
   const file = new File([blob], filename, {type:'application/json'});
   if(navigator.canShare && navigator.canShare({files:[file]})){
     try{
@@ -208,7 +207,6 @@ function del(i){
   }
 }
 
-// 수동 추가
 addManual.onclick=()=>{
   const c=manualCode.value.trim();
   const q=parseInt(manualQty.value)||1;
@@ -218,8 +216,6 @@ addManual.onclick=()=>{
 };
 
 start.onclick=start;
-export.onclick=exportCSV;
-xlsx.onclick=exportXLSX;
 downloadLocal.onclick=saveAndShare;
 reset.onclick=reset;
 
