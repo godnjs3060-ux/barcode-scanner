@@ -311,36 +311,44 @@ async function initDetector(){
   return true;
 }
 
+let lastResults=[];
+
+// 매 프레임 박스 그리기
+function drawLoop(){
+  if(!scanning)return;
+  const canvas=document.getElementById('scan-canvas');
+  const ctx=canvas.getContext('2d');
+  if(vid.videoWidth>0){
+    canvas.width=vid.videoWidth;
+    canvas.height=vid.videoHeight;
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    lastResults.forEach((r,i)=>{
+      const pts=r.cornerPoints;
+      ctx.beginPath();
+      ctx.moveTo(pts[0].x,pts[0].y);
+      pts.forEach(p=>ctx.lineTo(p.x,p.y));
+      ctx.closePath();
+      ctx.strokeStyle=i===0?'#00e5a0':'#ffffff';
+      ctx.lineWidth=4;
+      ctx.stroke();
+      ctx.fillStyle=i===0?'rgba(0,229,160,0.2)':'rgba(255,255,255,0.1)';
+      ctx.fill();
+    });
+  }
+  requestAnimationFrame(drawLoop);
+}
+
+// 1초마다 바코드 감지
 async function scanFrame(){
   if(!scanning)return;
   if(vid.readyState>=2){
     try{
       const results=await detector.detect(vid);
-      const canvas=document.getElementById('scan-canvas');
-      const ctx=canvas.getContext('2d');
-      canvas.width=vid.videoWidth;
-      canvas.height=vid.videoHeight;
-      ctx.clearRect(0,0,canvas.width,canvas.height);
-      if(results.length>0){
-        // 모든 인식된 바코드에 박스 그리기
-        results.forEach((r,i)=>{
-          const pts=r.cornerPoints;
-          ctx.beginPath();
-          ctx.moveTo(pts[0].x,pts[0].y);
-          pts.forEach(p=>ctx.lineTo(p.x,p.y));
-          ctx.closePath();
-          ctx.strokeStyle=i===0?'#00e5a0':'#ffffff';
-          ctx.lineWidth=3;
-          ctx.stroke();
-          ctx.fillStyle=i===0?'rgba(0,229,160,0.15)':'rgba(255,255,255,0.1)';
-          ctx.fill();
-        });
-        // 첫번째(가장 큰) 바코드 인식
-        onDetected(results[0].rawValue);
-      }
+      lastResults=results;
+      if(results.length>0)onDetected(results[0].rawValue);
     }catch(e){}
   }
-  raf=setTimeout(scanFrame, 1000);
+  raf=setTimeout(scanFrame,1000);
 }
 
 async function startCam(){
@@ -366,6 +374,7 @@ async function startCam(){
     scanning=true;
     status.textContent='스캔 중... 바코드를 카메라에 비춰주세요';
     scanFrame();
+    drawLoop();
   }catch(e){
     status.textContent='❌ 카메라 권한이 필요합니다: '+e.message;
   }
