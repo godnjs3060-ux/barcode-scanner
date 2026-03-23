@@ -6,13 +6,19 @@
 <title>바코드 스캐너</title>
 
 <style>
-body{margin:0;font-family:sans-serif;background:#111;color:#fff}
+body{margin:0;font-family:sans-serif;background:#000;color:#fff}
 #video{width:100%;height:250px;object-fit:cover;background:#000}
-#controls{padding:10px}
-button{padding:10px;margin:5px;border:none;border-radius:6px;cursor:pointer}
+#overlay{
+  position:absolute;top:0;left:0;width:100%;height:250px;
+  border:2px solid rgba(0,255,0,0.5);
+  box-sizing:border-box;
+}
+#controls{padding:10px;background:#111}
+button{padding:10px;margin:5px;border:none;border-radius:6px}
 #start{background:#00e5a0;color:#000}
+#save{background:#333;color:#fff}
 #reset{background:#ff4d4d;color:#fff}
-input,select{padding:8px;border-radius:6px;border:none;margin:5px}
+input{padding:8px;border-radius:6px;border:none;margin:5px}
 #list{padding:10px}
 .item{border-bottom:1px solid #333;padding:8px 0;display:flex;justify-content:space-between}
 .qty{color:#00e5a0}
@@ -21,22 +27,17 @@ input,select{padding:8px;border-radius:6px;border:none;margin:5px}
 
 <body>
 
-<video id="video" autoplay playsinline></video>
+<div style="position:relative;">
+  <video id="video" autoplay playsinline></video>
+  <div id="overlay"></div>
+</div>
 
 <div id="controls">
 
-  <input id="worker" placeholder="작업자 이름">
-  
-  <select id="mode">
-    <option value="sum">누적</option>
-    <option value="single">단건</option>
-    <option value="manual">확인</option>
-  </select>
+  <input id="worker" placeholder="작업자 이름 (필수)">
 
-  <br>
-
-  <button id="start">스캔 시작</button>
-  <button id="downloadLocal">저장+공유</button>
+  <button id="start">카메라 시작</button>
+  <button id="save">저장+공유</button>
   <button id="reset">초기화</button>
 
   <br>
@@ -49,11 +50,8 @@ input,select{padding:8px;border-radius:6px;border:none;margin:5px}
 
 <div id="list"></div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-
 <script>
-let detector, stream;
-let lastScan="", lastTime=0;
+let stream;
 let records = JSON.parse(localStorage.getItem('records')||'[]');
 
 // 작업자 유지
@@ -64,7 +62,7 @@ if(savedWorker){
   });
 }
 
-function save(){
+function saveLocal(){
   localStorage.setItem('records',JSON.stringify(records));
 }
 
@@ -91,7 +89,7 @@ function render(){
     <div class="item">
       <div>
         <div>${r.code}</div>
-        <small>${r.time} / ${r.worker||''}</small>
+        <small>${r.time} / ${r.worker}</small>
       </div>
       <div>
         <span class="qty">${r.qty}</span>
@@ -103,86 +101,58 @@ function render(){
 }
 
 function addRecord(code,qty=1){
-  const mode=document.getElementById('mode').value;
   const worker=document.getElementById('worker').value;
+
+  if(!worker){
+    alert('작업자 이름을 입력하세요');
+    return;
+  }
 
   localStorage.setItem('worker', worker);
 
-  if(mode==='sum'){
-    let f=records.find(r=>r.code===code);
-    if(f) f.qty+=qty;
-    else records.push({code,qty,time:nowStr(),worker});
-  }
-  else if(mode==='single'){
-    records.push({code,qty:1,time:nowStr(),worker});
-  }
-  else{
-    const input=prompt('수량 입력',qty);
-    const q=parseInt(input)||1;
-    records.push({code,qty:q,time:nowStr(),worker});
-  }
+  let f=records.find(r=>r.code===code);
+  if(f) f.qty+=qty;
+  else records.push({code,qty,time:nowStr(),worker});
 
   navigator.vibrate?.(100);
-  save(); render();
+  saveLocal(); render();
 }
 
-// 🔥 카메라 안정 버전 (검은화면 해결)
+// 🔥 카메라 (안정)
 async function start(){
   try{
-    const video = document.getElementById('video');
+    const video=document.getElementById('video');
 
     stream = await navigator.mediaDevices.getUserMedia({
-      video:{
-        facingMode: { ideal: 'environment' },
-        width: { ideal: 1280 },
-        height: { ideal: 720 }
-      },
+      video:{facingMode:{ideal:'environment'}},
       audio:false
     });
 
     video.srcObject = stream;
-    video.setAttribute('playsinline', true);
-    video.muted = true;
     await video.play();
 
-    detector = new BarcodeDetector();
-
-    scan();
-
   }catch(e){
-    alert('카메라 오류: ' + e.message);
+    alert('카메라 오류: '+e.message);
   }
 }
 
-async function scan(){
-  const v=document.getElementById('video');
-  if(v.readyState===v.HAVE_ENOUGH_DATA){
-    try{
-      const b=await detector.detect(v);
-      if(b.length){
-        const code=b[0].rawValue;
-        const now=Date.now();
-        if(code!==lastScan||now-lastTime>1500){
-          lastScan=code; lastTime=now;
-          addRecord(code,1);
-        }
-      }
-    }catch(e){}
-  }
-  requestAnimationFrame(scan);
-}
-
-// 저장 + 공유
+// 저장+공유
 async function saveAndShare(){
-  const blob = new Blob([JSON.stringify(records)], {type:'application/json'});
-  const filename = fileName()+'.json';
+  if(records.length===0){
+    alert('데이터 없음');
+    return;
+  }
 
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = filename;
+  const blob=new Blob([JSON.stringify(records)],{type:'application/json'});
+  const filename=fileName()+'.json';
+
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download=filename;
   a.click();
 
-  const file = new File([blob], filename, {type:'application/json'});
+  const file=new File([blob],filename,{type:'application/json'});
+
   if(navigator.canShare && navigator.canShare({files:[file]})){
     try{
       await navigator.share({files:[file],title:'스캔 데이터'});
@@ -192,21 +162,22 @@ async function saveAndShare(){
 
 function reset(){
   if(confirm('전체 삭제?')){
-    records=[]; save(); render();
+    records=[]; saveLocal(); render();
   }
 }
 
 function edit(i){
   const q=prompt('수량',records[i].qty);
-  if(q){records[i].qty=parseInt(q)||1; save(); render();}
+  if(q){records[i].qty=parseInt(q)||1; saveLocal(); render();}
 }
 
 function del(i){
   if(confirm('삭제?')){
-    records.splice(i,1); save(); render();
+    records.splice(i,1); saveLocal(); render();
   }
 }
 
+// 수동 입력
 addManual.onclick=()=>{
   const c=manualCode.value.trim();
   const q=parseInt(manualQty.value)||1;
@@ -216,7 +187,7 @@ addManual.onclick=()=>{
 };
 
 start.onclick=start;
-downloadLocal.onclick=saveAndShare;
+save.onclick=saveAndShare;
 reset.onclick=reset;
 
 render();
