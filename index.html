@@ -292,7 +292,7 @@ function onDetected(code){
   chint.textContent=fields.length>=3?`바코드 수량: ${defQty}`:'기본값 1';
   expr='';updCalc();
   rp.style.display='block';
-  setTimeout(()=>{const camH=document.getElementById('cam-wrap').offsetHeight;window.scrollTo({top:camH,behavior:'smooth'});},60);
+  setTimeout(()=>{const top=rp.getBoundingClientRect().top+window.scrollY-4;window.scrollTo({top,behavior:'smooth'});},80);
 }
 
 // BarcodeDetector 기반 스캔 루프
