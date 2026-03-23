@@ -23,19 +23,17 @@
 
   /* 카메라 */
   #cam-wrap{position:sticky;top:0;z-index:10;background:#000;flex-shrink:0}
-  #cam-box{position:relative;width:100%;height:280px;overflow:hidden;background:#000}
-  #vid{width:100%;height:100%;object-fit:cover;display:block}
+  #cam-box{position:relative;width:100%;height:200px;overflow:hidden;background:#000}
+  #vid{width:100%;height:200px;object-fit:cover;display:block}
   /* 스캔 프레임 오버레이 */
   #overlay{position:absolute;inset:0;pointer-events:none}
   #overlay canvas{position:absolute;inset:0;width:100%;height:100%}
-  .frame-box{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:56%;aspect-ratio:1;border:none}
-  .corner{position:absolute;width:20px;height:20px;border-color:var(--accent);border-style:solid;border-width:0}
-  .corner.tl{top:0;left:0;border-top-width:3px;border-left-width:3px}
-  .corner.tr{top:0;right:0;border-top-width:3px;border-right-width:3px}
-  .corner.bl{bottom:0;left:0;border-bottom-width:3px;border-left-width:3px}
-  .corner.br{bottom:0;right:0;border-bottom-width:3px;border-right-width:3px}
-  .scanline{position:absolute;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--accent),transparent);animation:sc 2s ease-in-out infinite}
-  @keyframes sc{0%{top:5%}50%{top:92%}100%{top:5%}}
+  .frame-box{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:60%;aspect-ratio:1}
+  .corner{position:absolute;width:28px;height:28px;border-color:var(--accent);border-style:solid;border-width:0}
+  .corner.tl{top:0;left:0;border-top-width:4px;border-left-width:4px;border-radius:3px 0 0 0}
+  .corner.tr{top:0;right:0;border-top-width:4px;border-right-width:4px;border-radius:0 3px 0 0}
+  .corner.bl{bottom:0;left:0;border-bottom-width:4px;border-left-width:4px;border-radius:0 0 0 3px}
+  .corner.br{bottom:0;right:0;border-bottom-width:4px;border-right-width:4px;border-radius:0 0 3px 0}
   #cam-status{text-align:center;padding:8px;font-size:13px;background:var(--surface2);color:var(--muted);border-top:1px solid var(--border)}
 
   /* 헤더 */
@@ -47,19 +45,19 @@
 
   /* 수량 패널 */
   #rp{display:none;margin:0.4rem 0.75rem;background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden}
-  .rph{padding:5px 10px;border-bottom:1px solid var(--border);font-size:11px;color:var(--muted)}
-  #fp{display:flex;flex-wrap:wrap;gap:4px;padding:5px 8px}
+  .rph{padding:4px 9px;border-bottom:1px solid var(--border);font-size:11px;color:var(--muted)}
+  #fp{display:flex;flex-wrap:wrap;gap:3px;padding:4px 7px}
   .chip{background:var(--surface2);color:var(--text);font-size:11px;padding:2px 7px;border-radius:5px;border:1px solid var(--border);font-family:var(--mono)}
   .chip.q{background:var(--accent-dim);color:var(--accent);border-color:transparent}
   .cnum{font-size:9px;color:var(--muted);margin-right:2px}
-  .cw{padding:6px 8px 8px}
-  .cd{background:var(--surface2);border-radius:8px;padding:5px 12px;margin-bottom:5px;text-align:right}
+  .cw{padding:5px 7px 7px}
+  .cd{background:var(--surface2);border-radius:8px;padding:4px 12px;margin-bottom:4px;text-align:right}
   .chint{font-size:10px;color:var(--muted)}
   .cexpr{font-size:11px;color:var(--muted);font-family:var(--mono);min-height:14px}
-  .cval{font-size:22px;font-weight:500;font-family:var(--mono)}
+  .cval{font-size:18px;font-weight:500;font-family:var(--mono)}
   .cval.err{color:var(--danger);font-size:14px}
-  .cgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:4px}
-  .cb{padding:12px 0;border:none;border-radius:7px;font-size:15px;font-weight:500;cursor:pointer;background:var(--surface2);color:var(--text);font-family:var(--mono)}
+  .cgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:3px}
+  .cb{padding:9px 0;border:none;border-radius:7px;font-size:14px;font-weight:500;cursor:pointer;background:var(--surface2);color:var(--text);font-family:var(--mono)}
   .cb:active{opacity:.7;transform:scale(.96)}
   .cb.op{background:#1e2e28;color:var(--accent)}
   .cb.act{background:#1a1a2e;color:#7b8cde;font-size:13px;font-family:var(--font)}
@@ -123,7 +121,6 @@
         <div class="frame-box">
           <div class="corner tl"></div><div class="corner tr"></div>
           <div class="corner bl"></div><div class="corner br"></div>
-          <div class="scanline"></div>
         </div>
       </div>
     </div>
