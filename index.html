@@ -119,6 +119,7 @@
   <div id="cam-wrap">
     <div id="cam-box">
       <video id="vid" playsinline muted autoplay></video>
+      <canvas id="scan-canvas" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none"></canvas>
       <div id="overlay">
         <div class="frame-box">
           <div class="corner tl"></div><div class="corner tr"></div>
@@ -315,7 +316,28 @@ async function scanFrame(){
   if(vid.readyState>=2){
     try{
       const results=await detector.detect(vid);
-      if(results.length>0)onDetected(results[0].rawValue);
+      const canvas=document.getElementById('scan-canvas');
+      const ctx=canvas.getContext('2d');
+      canvas.width=vid.videoWidth;
+      canvas.height=vid.videoHeight;
+      ctx.clearRect(0,0,canvas.width,canvas.height);
+      if(results.length>0){
+        // 모든 인식된 바코드에 박스 그리기
+        results.forEach((r,i)=>{
+          const pts=r.cornerPoints;
+          ctx.beginPath();
+          ctx.moveTo(pts[0].x,pts[0].y);
+          pts.forEach(p=>ctx.lineTo(p.x,p.y));
+          ctx.closePath();
+          ctx.strokeStyle=i===0?'#00e5a0':'#ffffff';
+          ctx.lineWidth=3;
+          ctx.stroke();
+          ctx.fillStyle=i===0?'rgba(0,229,160,0.15)':'rgba(255,255,255,0.1)';
+          ctx.fill();
+        });
+        // 첫번째(가장 큰) 바코드 인식
+        onDetected(results[0].rawValue);
+      }
     }catch(e){}
   }
   raf=setTimeout(scanFrame, 1000);
