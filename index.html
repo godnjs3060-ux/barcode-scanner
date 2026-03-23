@@ -357,19 +357,23 @@ async function scanFrame(){
   if(!scanning)return;
   if(vid.readyState>=2){
     try{
-      // 초록 박스 영역만 잘라서 인식
       const vw=vid.videoWidth,vh=vid.videoHeight;
-      const boxSize=0.6; // 박스 크기 비율 (CSS와 동일하게 60%)
-      const bw=Math.floor(vw*boxSize);
-      const bh=Math.floor(bw); // 정사각형
-      const bx=Math.floor((vw-bw)/2);
-      const by=Math.floor((vh-bh)/2);
+      // 화면에 실제로 보이는 영역 계산 (object-fit:cover)
+      const dispW=vid.offsetWidth,dispH=vid.offsetHeight;
+      const scale=Math.max(dispW/vw,dispH/vh);
+      const visW=dispW/scale, visH=dispH/scale;
+      const offX=(vw-visW)/2, offY=(vh-visH)/2;
+      // 초록 박스 = 보이는 영역의 60% 정사각형
+      const boxRatio=0.6;
+      const bw=Math.floor(visW*boxRatio);
+      const bh=Math.floor(bw);
+      const bx=Math.floor(offX+(visW-bw)/2);
+      const by=Math.floor(offY+(visH-bh)/2);
       const crop=document.createElement('canvas');
       crop.width=bw;crop.height=bh;
       crop.getContext('2d').drawImage(vid,bx,by,bw,bh,0,0,bw,bh);
       const results=await detector.detect(crop);
       if(results.length>0){
-        // cornerPoints를 전체 video 좌표로 변환해서 박스 그리기
         const mapped=results.map(r=>({
           rawValue:r.rawValue,
           cornerPoints:r.cornerPoints.map(p=>({x:p.x+bx,y:p.y+by}))
