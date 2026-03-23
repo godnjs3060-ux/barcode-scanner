@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>바코드 스캐너 PRO++</title>
+
 <style>
 body{margin:0;font-family:sans-serif;background:#111;color:#fff}
 #video{width:100%;height:220px;object-fit:cover;background:#000}
@@ -18,39 +19,52 @@ input,select{padding:8px;border-radius:6px;border:none;margin:5px}
 .qty{color:#00e5a0}
 </style>
 </head>
+
 <body>
 
 <video id="video" autoplay playsinline></video>
 
 <div id="controls">
-  <input id="manager" placeholder="관리자 이름">
+
+  <input id="worker" placeholder="작업자 이름">
   <select id="mode">
     <option value="sum">누적</option>
     <option value="single">단건</option>
     <option value="manual">확인</option>
-  </select><br>
+  </select>
+
+  <br>
 
   <button id="start">스캔 시작</button>
   <button id="export">CSV</button>
   <button id="xlsx">엑셀</button>
-  <button id="downloadLocal">파일 저장</button>
-  <button id="share">공유</button>
-  <button id="reset">초기화</button><br>
+  <button id="downloadLocal">저장+공유</button>
+  <button id="reset">초기화</button>
+
+  <br>
 
   <input id="manualCode" placeholder="바코드 입력">
   <input id="manualQty" type="number" value="1">
   <button id="addManual">수동추가</button>
 
-  <input type="file" id="fileInput" style="display:none">
 </div>
 
 <div id="list"></div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
 <script>
 let detector, stream;
 let lastScan="", lastTime=0;
 let records = JSON.parse(localStorage.getItem('records')||'[]');
+
+// 작업자 자동 저장
+const savedWorker = localStorage.getItem('worker');
+if(savedWorker){
+  window.addEventListener('DOMContentLoaded',()=>{
+    document.getElementById('worker').value = savedWorker;
+  });
+}
 
 function save(){
   localStorage.setItem('records',JSON.stringify(records));
@@ -58,14 +72,19 @@ function save(){
 
 function nowStr(){
   const d=new Date();
-  return d.toISOString().replace(/T/,' ').substring(0,19);
+  return d.toISOString().replace('T',' ').substring(0,19);
 }
 
 function fileName(){
   const d=new Date();
-  const s=d.toISOString().replace(/[:T]/g,'-').slice(0,19);
-  const m=document.getElementById('manager').value||'unknown';
-  return `scan_${m}_${s}`;
+  const yyyy=d.getFullYear();
+  const mm=String(d.getMonth()+1).padStart(2,'0');
+  const dd=String(d.getDate()).padStart(2,'0');
+  const hh=String(d.getHours()).padStart(2,'0');
+  const mi=String(d.getMinutes()).padStart(2,'0');
+  const ss=String(d.getSeconds()).padStart(2,'0');
+  const w=document.getElementById('worker').value || 'unknown';
+  return `scan_${w}_${yyyy}-${mm}-${dd}_${hh}-${mi}-${ss}`;
 }
 
 function render(){
@@ -74,7 +93,7 @@ function render(){
     <div class="item">
       <div>
         <div>${r.code}</div>
-        <small>${r.time} / ${r.manager||''}</small>
+        <small>${r.time} / ${r.worker||''}</small>
       </div>
       <div>
         <span class="qty">${r.qty}</span>
@@ -87,20 +106,22 @@ function render(){
 
 function addRecord(code,qty=1){
   const mode=document.getElementById('mode').value;
-  const manager=document.getElementById('manager').value;
+  const worker=document.getElementById('worker').value;
+
+  localStorage.setItem('worker', worker);
 
   if(mode==='sum'){
     let f=records.find(r=>r.code===code);
     if(f) f.qty+=qty;
-    else records.push({code,qty,time:nowStr(),manager});
+    else records.push({code,qty,time:nowStr(),worker});
   }
   else if(mode==='single'){
-    records.push({code,qty:1,time:nowStr(),manager});
+    records.push({code,qty:1,time:nowStr(),worker});
   }
   else{
     const input=prompt('수량 입력',qty);
     const q=parseInt(input)||1;
-    records.push({code,qty:q,time:nowStr(),manager});
+    records.push({code,qty:q,time:nowStr(),worker});
   }
 
   navigator.vibrate?.(100);
@@ -131,9 +152,10 @@ async function scan(){
   requestAnimationFrame(scan);
 }
 
+// CSV
 function exportCSV(){
-  let csv='code,qty,time,manager\n';
-  records.forEach(r=>csv+=`${r.code},${r.qty},${r.time},${r.manager}\n`);
+  let csv='code,qty,time,worker\n';
+  records.forEach(r=>csv+=`${r.code},${r.qty},${r.time},${r.worker}\n`);
   const blob=new Blob([csv],{type:'text/csv'});
   const a=document.createElement('a');
   a.href=URL.createObjectURL(blob);
@@ -141,6 +163,7 @@ function exportCSV(){
   a.click();
 }
 
+// XLSX
 function exportXLSX(){
   const ws=XLSX.utils.json_to_sheet(records);
   const wb=XLSX.utils.book_new();
@@ -148,26 +171,44 @@ function exportXLSX(){
   XLSX.writeFile(wb,fileName()+'.xlsx');
 }
 
-function downloadJSON(){
-  const blob=new Blob([JSON.stringify(records)],{type:'application/json'});
-  const a=document.createElement('a');
-  a.href=URL.createObjectURL(blob);
-  a.download=fileName()+'.json';
+// 저장 + 공유
+async function saveAndShare(){
+  const blob = new Blob([JSON.stringify(records)], {type:'application/json'});
+  const filename = fileName()+'.json';
+
+  // 파일 저장
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = filename;
   a.click();
+
+  // 공유
+  const file = new File([blob], filename, {type:'application/json'});
+  if(navigator.canShare && navigator.canShare({files:[file]})){
+    try{
+      await navigator.share({files:[file],title:'스캔 데이터'});
+    }catch(e){}
+  }
 }
 
-async function shareFile(){
-  const blob=new Blob([JSON.stringify(records)],{type:'application/json'});
-  const file=new File([blob],fileName()+'.json');
-  if(navigator.share){
-    await navigator.share({files:[file],title:'스캔 데이터'});
-  }else alert('공유 미지원');
+function reset(){
+  if(confirm('전체 삭제?')){
+    records=[]; save(); render();
+  }
 }
 
-function reset(){ if(confirm('전체 삭제?')){records=[];save();render();}}
-function edit(i){const q=prompt('수량',records[i].qty);if(q){records[i].qty=parseInt(q)||1;save();render();}}
-function del(i){if(confirm('삭제?')){records.splice(i,1);save();render();}}
+function edit(i){
+  const q=prompt('수량',records[i].qty);
+  if(q){records[i].qty=parseInt(q)||1; save(); render();}
+}
 
+function del(i){
+  if(confirm('삭제?')){
+    records.splice(i,1); save(); render();
+  }
+}
+
+// 수동 추가
 addManual.onclick=()=>{
   const c=manualCode.value.trim();
   const q=parseInt(manualQty.value)||1;
@@ -179,8 +220,7 @@ addManual.onclick=()=>{
 start.onclick=start;
 export.onclick=exportCSV;
 xlsx.onclick=exportXLSX;
-downloadLocal.onclick=downloadJSON;
-share.onclick=shareFile;
+downloadLocal.onclick=saveAndShare;
 reset.onclick=reset;
 
 render();
