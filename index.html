@@ -281,8 +281,7 @@ document.getElementById('save-btn').addEventListener('click',()=>{
   fields[2]=String(qty);
   records.push({barcode:currentCode,fields,datetime:fmt(new Date()),qty});
   save();
-  rp.classList.remove('show');
-  // 저장 후 초기화 - 중복 저장 방지
+  rp.classList.remove('show');rp.style.display='none';
   currentCode='';lastCode='';lastTime=0;lastResults=[];
   expr='';
   renderList();showToast('저장되었습니다');
@@ -300,7 +299,7 @@ function onDetected(code){
   fp.innerHTML=fields.map((f,i)=>`<span class="chip${i===2?' q':''}"><span class="cnum">${i+1}</span>${f||'　'}</span>`).join('');
   chint.textContent=fields.length>=3?`바코드 수량: ${defQty}`:'기본값 1';
   expr='';updCalc();
-  rp.classList.add('show');
+  rp.classList.add('show');rp.style.display='block';
 
 }
 
@@ -360,7 +359,12 @@ async function scanFrame(){
     try{
       const results=await detector.detect(vid);
       lastResults=results;
-      if(results.length>0)onDetected(results[0].rawValue);
+      if(results.length>0){
+        onDetected(results[0].rawValue);
+      }else{
+        // 바코드 없으면 박스 지우기
+        setTimeout(()=>{lastResults=[];},500);
+      }
     }catch(e){}
   }
   raf=setTimeout(scanFrame,1000);
