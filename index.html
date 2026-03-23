@@ -267,7 +267,8 @@ function showToast(msg){toast.textContent=msg;toast.classList.add('show');clearT
 function fmt(d){const p=n=>String(n).padStart(2,'0');return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}:${p(d.getSeconds())}`;}
 
 function splitBarcode(code){
-  return code.split('/').map(s=>s.trim()).filter(s=>s!=='');
+  // 빈값 유지로 열 순서 보장
+  return code.split('/').map(s=>s.trim());
 }
 function extractQty(fields){
   if(fields.length>=3){const v=parseFloat(fields[2]);if(!isNaN(v)&&v>0)return v;}
@@ -319,6 +320,7 @@ document.getElementById('save-btn').addEventListener('click',()=>{
   resultPanel.style.display='none';
   expr='';
   renderList();showToast('저장되었습니다');
+  window.scrollTo({top:0,behavior:'smooth'});
 });
 
 // ── 수정 모달 ──
