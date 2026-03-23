@@ -44,7 +44,7 @@
   #badge{margin-left:auto;font-size:11px;color:var(--accent);background:var(--accent-dim);padding:2px 9px;border-radius:20px}
 
   /* 수량 패널 */
-  #rp{display:none;margin:0.4rem 0.75rem;background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden}
+  #rp{display:none;position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;background:var(--surface);border-top:1px solid var(--border);border-radius:16px 16px 0 0;z-index:50;max-height:75vh;overflow-y:auto}
   .rph{padding:4px 9px;border-bottom:1px solid var(--border);font-size:11px;color:var(--muted)}
   #fp{display:flex;flex-wrap:wrap;gap:3px;padding:4px 7px}
   .chip{background:var(--surface2);color:var(--text);font-size:11px;padding:2px 7px;border-radius:5px;border:1px solid var(--border);font-family:var(--mono)}
@@ -292,7 +292,7 @@ function onDetected(code){
   chint.textContent=fields.length>=3?`바코드 수량: ${defQty}`:'기본값 1';
   expr='';updCalc();
   rp.style.display='block';
-  setTimeout(()=>{const top=rp.getBoundingClientRect().top+window.scrollY-4;window.scrollTo({top,behavior:'smooth'});},80);
+
 }
 
 // BarcodeDetector 기반 스캔 루프
