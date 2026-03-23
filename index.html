@@ -44,8 +44,7 @@
   #badge{margin-left:auto;font-size:11px;color:var(--accent);background:var(--accent-dim);padding:2px 9px;border-radius:20px}
 
   /* 수량 패널 */
-  #rp-backdrop{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:49}
-  #rp-backdrop.show{display:block}
+  #rp-backdrop{display:none}
   #rp{display:none;position:fixed;bottom:0;left:0;right:0;background:var(--surface);border-top:2px solid var(--border);border-radius:16px 16px 0 0;z-index:50;overflow:hidden;padding-bottom:env(safe-area-inset-bottom)}
   #rp.show{display:block!important}
   .rph{padding:4px 9px;border-bottom:1px solid var(--border);font-size:11px;color:var(--muted)}
@@ -286,7 +285,7 @@ document.getElementById('save-btn').addEventListener('click',()=>{
 
 function onDetected(code){
   const now=Date.now();
-  if(code===lastCode&&now-lastTime<3000)return;
+  if(code===lastCode&&now-lastTime<5000)return;
   lastCode=code;lastTime=now;
   if(navigator.vibrate)navigator.vibrate([80]);
   currentCode=code;
@@ -319,7 +318,7 @@ async function scanFrame(){
       if(results.length>0)onDetected(results[0].rawValue);
     }catch(e){}
   }
-  raf=requestAnimationFrame(scanFrame);
+  raf=setTimeout(scanFrame, 500);
 }
 
 async function startCam(){
