@@ -263,7 +263,7 @@ document.querySelector('.cgrid').addEventListener('click',e=>{
   const a=b.dataset.a,v=b.dataset.v;
   if(a==='C'){expr='';updCalc();}
   else if(a==='back'){expr=expr.slice(0,-1);updCalc();}
-  else if(a==='cancel'){rp.classList.remove('show');document.getElementById('rp-backdrop').classList.remove('show');expr='';}
+  else if(a==='cancel'){rp.classList.remove('show');expr='';}
   else if(v!==undefined){
     const ops=['+','-','*','/','%'];
     if(ops.includes(v)&&ops.includes(expr.slice(-1)))expr=expr.slice(0,-1);
@@ -294,7 +294,7 @@ function onDetected(code){
   fp.innerHTML=fields.map((f,i)=>`<span class="chip${i===2?' q':''}"><span class="cnum">${i+1}</span>${f||'　'}</span>`).join('');
   chint.textContent=fields.length>=3?`바코드 수량: ${defQty}`:'기본값 1';
   expr='';updCalc();
-  rp.classList.add('show');document.getElementById('rp-backdrop').classList.add('show');
+  rp.classList.add('show');
 
 }
 
@@ -318,7 +318,7 @@ async function scanFrame(){
       if(results.length>0)onDetected(results[0].rawValue);
     }catch(e){}
   }
-  raf=setTimeout(scanFrame, 500);
+  raf=setTimeout(scanFrame, 1000);
 }
 
 async function startCam(){
@@ -326,9 +326,19 @@ async function startCam(){
   if(!ok)return;
   try{
     stream=await navigator.mediaDevices.getUserMedia({
-      video:{facingMode:'environment',width:{ideal:1920},height:{ideal:1080}},
+      video:{
+        facingMode:'environment',
+        width:{ideal:1280},
+        height:{ideal:720},
+        exposureMode:'continuous',
+        whiteBalanceMode:'continuous',
+        focusMode:'continuous'
+      },
       audio:false
     });
+    // 밝기 자동 조정
+    const track=stream.getVideoTracks()[0];
+    try{await track.applyConstraints({advanced:[{exposureMode:'continuous',whiteBalanceMode:'continuous',focusMode:'continuous'}]});}catch(e){}
     vid.srcObject=stream;
     await vid.play();
     scanning=true;
@@ -425,7 +435,7 @@ document.getElementById('xlsx-btn').addEventListener('click',()=>{
   XLSX.writeFile(wb,`scan_${new Date().toISOString().slice(0,10)}.xlsx`);
 });
 
-document.getElementById('rp-backdrop').addEventListener('click',()=>{rp.classList.remove('show');document.getElementById('rp-backdrop').classList.remove('show');expr='';});
+document.getElementById('rp-backdrop').addEventListener('click',()=>{rp.classList.remove('show');expr='';});
 load();renderList();
 startCam();
 </script>
