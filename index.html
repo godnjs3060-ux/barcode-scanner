@@ -273,13 +273,18 @@ document.querySelector('.cgrid').addEventListener('click',e=>{
 });
 
 document.getElementById('save-btn').addEventListener('click',()=>{
+  if(!currentCode){showToast('스캔된 바코드가 없습니다');return;}
   const qty=finalQty();
   if(qty===null){showToast('올바른 수량을 입력해주세요');return;}
   const fields=split(currentCode);
   while(fields.length<3)fields.push('');
   fields[2]=String(qty);
   records.push({barcode:currentCode,fields,datetime:fmt(new Date()),qty});
-  save();rp.style.display='none';expr='';
+  save();
+  rp.classList.remove('show');
+  // 저장 후 초기화 - 중복 저장 방지
+  currentCode='';lastCode='';lastTime=0;lastResults=[];
+  expr='';
   renderList();showToast('저장되었습니다');
   window.scrollTo({top:0,behavior:'smooth'});
 });
@@ -318,26 +323,32 @@ function drawLoop(){
   if(!scanning)return;
   const canvas=document.getElementById('scan-canvas');
   const ctx=canvas.getContext('2d');
-  const dw=vid.offsetWidth||canvas.offsetWidth;
-  const dh=vid.offsetHeight||canvas.offsetHeight;
+  // CSS 픽셀 기준으로 canvas 크기 설정
+  const rect=vid.getBoundingClientRect();
+  const dw=rect.width;
+  const dh=rect.height;
+  if(dw===0||dh===0){requestAnimationFrame(drawLoop);return;}
   canvas.width=dw;
   canvas.height=dh;
   ctx.clearRect(0,0,dw,dh);
+  // 첫 번째 바코드만 표시
   if(lastResults.length>0&&vid.videoWidth>0){
-    const scaleX=dw/vid.videoWidth;
-    const scaleY=dh/vid.videoHeight;
-    lastResults.forEach((r,i)=>{
-      const pts=r.cornerPoints;
-      ctx.beginPath();
-      ctx.moveTo(pts[0].x*scaleX,pts[0].y*scaleY);
-      pts.forEach(p=>ctx.lineTo(p.x*scaleX,p.y*scaleY));
-      ctx.closePath();
-      ctx.strokeStyle=i===0?'#00e5a0':'#ffffff';
-      ctx.lineWidth=3;
-      ctx.stroke();
-      ctx.fillStyle=i===0?'rgba(0,229,160,0.2)':'rgba(255,255,255,0.12)';
-      ctx.fill();
-    });
+    const r=lastResults[0];
+    // video의 object-fit:cover 오프셋 계산
+    const vw=vid.videoWidth,vh=vid.videoHeight;
+    const scale=Math.max(dw/vw,dh/vh);
+    const ox=(dw-vw*scale)/2;
+    const oy=(dh-vh*scale)/2;
+    const pts=r.cornerPoints;
+    ctx.beginPath();
+    ctx.moveTo(pts[0].x*scale+ox,pts[0].y*scale+oy);
+    pts.forEach(p=>ctx.lineTo(p.x*scale+ox,p.y*scale+oy));
+    ctx.closePath();
+    ctx.strokeStyle='#00e5a0';
+    ctx.lineWidth=3;
+    ctx.stroke();
+    ctx.fillStyle='rgba(0,229,160,0.15)';
+    ctx.fill();
   }
   requestAnimationFrame(drawLoop);
 }
