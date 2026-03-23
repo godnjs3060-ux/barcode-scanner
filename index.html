@@ -47,7 +47,7 @@
   #rp-backdrop{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:49}
   #rp-backdrop.show{display:block}
   #rp{display:none;position:fixed;bottom:0;left:0;right:0;background:var(--surface);border-top:2px solid var(--border);border-radius:16px 16px 0 0;z-index:50;overflow:hidden;padding-bottom:env(safe-area-inset-bottom)}
-  #rp.show{display:block}
+  #rp.show{display:block!important}
   .rph{padding:4px 9px;border-bottom:1px solid var(--border);font-size:11px;color:var(--muted)}
   #fp{display:flex;flex-wrap:wrap;gap:3px;padding:4px 7px}
   .chip{background:var(--surface2);color:var(--text);font-size:11px;padding:2px 7px;border-radius:5px;border:1px solid var(--border);font-family:var(--mono)}
@@ -264,7 +264,7 @@ document.querySelector('.cgrid').addEventListener('click',e=>{
   const a=b.dataset.a,v=b.dataset.v;
   if(a==='C'){expr='';updCalc();}
   else if(a==='back'){expr=expr.slice(0,-1);updCalc();}
-  else if(a==='cancel'){rp.style.display='none';rp.classList.remove('show');document.getElementById('rp-backdrop').classList.remove('show');expr='';}
+  else if(a==='cancel'){rp.classList.remove('show');document.getElementById('rp-backdrop').classList.remove('show');expr='';}
   else if(v!==undefined){
     const ops=['+','-','*','/','%'];
     if(ops.includes(v)&&ops.includes(expr.slice(-1)))expr=expr.slice(0,-1);
@@ -295,7 +295,7 @@ function onDetected(code){
   fp.innerHTML=fields.map((f,i)=>`<span class="chip${i===2?' q':''}"><span class="cnum">${i+1}</span>${f||'　'}</span>`).join('');
   chint.textContent=fields.length>=3?`바코드 수량: ${defQty}`:'기본값 1';
   expr='';updCalc();
-  rp.classList.add('show');rp.style.display='block';document.getElementById('rp-backdrop').classList.add('show');
+  rp.classList.add('show');document.getElementById('rp-backdrop').classList.add('show');
 
 }
 
@@ -426,7 +426,7 @@ document.getElementById('xlsx-btn').addEventListener('click',()=>{
   XLSX.writeFile(wb,`scan_${new Date().toISOString().slice(0,10)}.xlsx`);
 });
 
-document.getElementById('rp-backdrop').addEventListener('click',()=>{rp.style.display='none';rp.classList.remove('show');document.getElementById('rp-backdrop').classList.remove('show');expr='';});
+document.getElementById('rp-backdrop').addEventListener('click',()=>{rp.classList.remove('show');document.getElementById('rp-backdrop').classList.remove('show');expr='';});
 load();renderList();
 startCam();
 </script>
