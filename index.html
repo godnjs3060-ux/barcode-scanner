@@ -143,7 +143,7 @@
 
   <header>
     <div class="logo"><svg viewBox="0 0 20 20"><rect x="2" y="2" width="3" height="16" rx="1"/><rect x="7" y="2" width="1.5" height="16" rx="0.5"/><rect x="10" y="2" width="3" height="16" rx="1"/><rect x="15" y="2" width="1.5" height="16" rx="0.5"/></svg></div>
-    <h1>바코드 스캐너 <span style="font-size:10px;color:var(--muted);font-weight:400">v2.2</span></h1>
+    <h1>바코드 스캐너 <span style="font-size:10px;color:var(--muted);font-weight:400">v2.3</span></h1>
     <div id="badge">0건</div>
   </header>
 
@@ -482,6 +482,7 @@ function renderList(){
       const v=r.fields?.[c]??'';
       h+=c===2?`<td class="tq">${v}</td>`:`<td>${v}</td>`;
     }
+    h+=`<td>${r.worker||''}</td><td>${r.location||''}</td>`;
     h+=`<td><div class="tacts"><button class="tb te" data-i="${idx}">수정</button><button class="tb td" data-i="${idx}">삭제</button></div></td></tr>`;
   });
   h+='</tbody></table>';
@@ -638,6 +639,8 @@ document.getElementById('cam-start-btn').addEventListener('click',()=>{
 
 // 수기입력
 document.getElementById('manual-btn').addEventListener('click',()=>{
+  if(!currentWorker){showToast('작업자를 선택해주세요');return;}
+  if(!currentLocation){showToast('위치를 선택해주세요');return;}
   ['m-f0','m-f1','m-f2','m-f3','m-f4','m-f5','m-f6','m-f7'].forEach(id=>{document.getElementById(id).value='';});
   document.getElementById('mm').style.display='flex';
   setTimeout(()=>document.getElementById('m-f0').focus(),100);
