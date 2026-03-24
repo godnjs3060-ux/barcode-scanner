@@ -7,7 +7,7 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="바코드 스캐너">
-<title>바코드 스캐너3.4</title>
+<title>바코드 스캐너</title>
 <link rel="manifest" href="manifest.json">
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500&display=swap');
@@ -141,7 +141,7 @@
 
   <header>
     <div class="logo"><svg viewBox="0 0 20 20"><rect x="2" y="2" width="3" height="16" rx="1"/><rect x="7" y="2" width="1.5" height="16" rx="0.5"/><rect x="10" y="2" width="3" height="16" rx="1"/><rect x="15" y="2" width="1.5" height="16" rx="0.5"/></svg></div>
-    <h1>바코드 스캐너</h1>
+    <h1>바코드 스캐너 <span style="font-size:10px;color:var(--muted);font-weight:400">v1.5</span></h1>
     <div id="badge">0건</div>
   </header>
 
@@ -632,10 +632,17 @@ document.getElementById('m-cancel').addEventListener('click',()=>{
 document.getElementById('m-ok').addEventListener('click',()=>{
   const vals=['m-f0','m-f1','m-f2','m-f3','m-f4','m-f5','m-f6','m-f7'].map(id=>document.getElementById(id).value.trim());
   if(!vals.some(v=>v)){showToast('최소 한 항목을 입력해주세요');return;}
-  // /로 합쳐서 onDetected에 넘김 - 스캔과 동일한 흐름
-  const code=vals.join('/');
   document.getElementById('mm').style.display='none';
-  onDetected(code);
+  // 중복체크 초기화 후 패널 직접 열기
+  lastCode='';lastTime=0;
+  const code=vals.join('/');
+  currentCode=code;
+  const fields=split(code);
+  defQty=getQty(fields);
+  fp.innerHTML=fields.map((f,i)=>'<span class="chip'+(i===2?' q':'')+'"><span class="cnum">'+(i+1)+'</span>'+(f||'　')+'</span>').join('');
+  chint.textContent=fields.length>=3?'바코드 수량: '+defQty:'기본값 1';
+  expr='';updCalc();
+  rp.classList.add('show');rp.style.display='block';
 });
 
 // 불러오기
