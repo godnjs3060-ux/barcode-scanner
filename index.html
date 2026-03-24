@@ -34,7 +34,7 @@
   .corner.tr{top:0;right:0;border-top-width:4px;border-right-width:4px;border-radius:0 3px 0 0}
   .corner.bl{bottom:0;left:0;border-bottom-width:4px;border-left-width:4px;border-radius:0 0 0 3px}
   .corner.br{bottom:0;right:0;border-bottom-width:4px;border-right-width:4px;border-radius:0 0 3px 0}
-  #cam-status{text-align:center;padding:8px;font-size:13px;background:var(--surface2);color:var(--muted);border-top:1px solid var(--border)}
+  #cam-status{text-align:center;padding:8px;font-size:13px;background:var(--surface2);color:var(--muted);border-top:1px solid var(--border);cursor:pointer}
 
   /* 헤더 */
   header{padding:0.6rem 1rem;display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--border)}
@@ -514,23 +514,23 @@ async function scanFrame(){
 }
 
 async function startCam(){
+  // 기존 스트림 정리
+  if(stream){
+    stream.getTracks().forEach(t=>t.stop());
+    stream=null;
+  }
+  scanning=false;
+  if(raf){clearTimeout(raf);raf=null;}
+
   const ok=await initDetector();
   if(!ok)return;
+
+  status.textContent='카메라 시작 중...';
   try{
     stream=await navigator.mediaDevices.getUserMedia({
-      video:{
-        facingMode:'environment',
-        width:{ideal:1280},
-        height:{ideal:720},
-        exposureMode:'continuous',
-        whiteBalanceMode:'continuous',
-        focusMode:'continuous'
-      },
+      video:{facingMode:'environment',width:{ideal:1280},height:{ideal:720}},
       audio:false
     });
-    // 밝기 자동 조정
-    const track=stream.getVideoTracks()[0];
-    try{await track.applyConstraints({advanced:[{exposureMode:'continuous',whiteBalanceMode:'continuous',focusMode:'continuous'}]});}catch(e){}
     vid.srcObject=stream;
     await vid.play();
     scanning=true;
@@ -538,7 +538,8 @@ async function startCam(){
     scanFrame();
     drawLoop();
   }catch(e){
-    status.textContent='❌ 카메라 권한이 필요합니다: '+e.message;
+    status.textContent='❌ 카메라 오류 — 탭해서 재시도';
+    stream=null;
   }
 }
 
@@ -772,8 +773,14 @@ document.getElementById('lm-close').addEventListener('click',()=>{
   document.getElementById('load-modal').style.display='none';
 });
 load();renderList();
-loadSelections();
+// 작업자/위치는 DOM 완전 로드 후 적용
+setTimeout(()=>{
+  loadSelections();
+},100);
 startCam();
+document.getElementById('cam-status').addEventListener('click',()=>{
+  if(!scanning)startCam();
+});
 </script>
 </body>
 </html>
