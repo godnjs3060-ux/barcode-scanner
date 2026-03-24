@@ -143,7 +143,7 @@
 
   <header>
     <div class="logo"><svg viewBox="0 0 20 20"><rect x="2" y="2" width="3" height="16" rx="1"/><rect x="7" y="2" width="1.5" height="16" rx="0.5"/><rect x="10" y="2" width="3" height="16" rx="1"/><rect x="15" y="2" width="1.5" height="16" rx="0.5"/></svg></div>
-    <h1>바코드 스캐너 <span style="font-size:10px;color:var(--muted);font-weight:400">v1.8</span></h1>
+    <h1>바코드 스캐너 <span style="font-size:10px;color:var(--muted);font-weight:400">v2.0</span></h1>
     <div id="badge">0건</div>
   </header>
 
@@ -457,7 +457,8 @@ function renderList(){
   if(!records.length){tw.innerHTML='<div style="padding:2.5rem 0;text-align:center;color:var(--muted);font-size:13px;line-height:2">아직 스캔된 항목이 없습니다</div>';return;}
   const mc=maxCols();
   let h='<table><thead><tr><th>날짜/시간</th>';
-  for(let i=0;i<mc;i++)h+=`<th>${i===2?'수량':'항목'+(i+1)}</th>`;
+  const fn3=['바코드','품명','수량','비고','시트명','파레트위치','구분','업체명'];
+  for(let i=0;i<mc;i++)h+=`<th>${fn3[i]||'항목'+(i+1)}</th>`;
   h+='<th>관리</th></tr></thead><tbody>';
   [...records].reverse().forEach((r,ri)=>{
     const idx=records.length-1-ri;
@@ -631,18 +632,21 @@ document.getElementById('m-cancel').addEventListener('click',()=>{
 });
 document.getElementById('m-ok').addEventListener('click',()=>{
   const vals=['m-f0','m-f1','m-f2','m-f3','m-f4','m-f5','m-f6','m-f7'].map(id=>document.getElementById(id).value.trim());
-  if(!vals.some(v=>v)){showToast('최소 한 항목을 입력해주세요');return;}
+  // 바코드 or 품명 필수
+  if(!vals[0]&&!vals[1]){showToast('바코드 또는 품명을 입력해주세요');return;}
+  // 수량 필수
+  if(!vals[2]||isNaN(parseFloat(vals[2]))||parseFloat(vals[2])<=0){showToast('수량을 입력해주세요');return;}
   document.getElementById('mm').style.display='none';
-  // 중복체크 초기화 후 수량패널 직접 열기
-  lastCode='';lastTime=0;
-  const code=vals.join('/');
-  currentCode=code;
-  const fields=split(code);
-  defQty=getQty(fields);
-  fp.innerHTML=fields.map((f,i)=>'<span class="chip'+(i===2?' q':'')+'"><span class="cnum">'+(i+1)+'</span>'+(f||'　')+'</span>').join('');
-  chint.textContent=fields.length>=3?'바코드 수량: '+defQty:'기본값 1';
-  expr='';updCalc();
-  rp.classList.add('show');rp.style.display='block';
+  // 바로 저장
+  const qty=parseFloat(vals[2]);
+  vals[2]=String(qty);
+  const fields=vals;
+  const rec={barcode:fields.join('/'),fields,datetime:fmt(new Date()),qty,worker:currentWorker,location:currentLocation};
+  records.push(rec);
+  save();renderList();
+  sendToTelegram(rec,'✏️ 수기입력');
+  sendToSheet(rec);
+  showToast('저장되었습니다');
 });
 
 // 불러오기
