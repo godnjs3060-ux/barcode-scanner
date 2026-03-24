@@ -34,7 +34,7 @@
   .corner.tr{top:0;right:0;border-top-width:4px;border-right-width:4px;border-radius:0 3px 0 0}
   .corner.bl{bottom:0;left:0;border-bottom-width:4px;border-left-width:4px;border-radius:0 0 0 3px}
   .corner.br{bottom:0;right:0;border-bottom-width:4px;border-right-width:4px;border-radius:0 0 3px 0}
-  #cam-status{text-align:center;padding:8px;font-size:13px;background:var(--surface2);color:var(--muted);border-top:1px solid var(--border);cursor:pointer}
+  #cam-status{text-align:center;padding:8px;font-size:13px;background:var(--surface2);color:var(--muted);border-top:1px solid var(--border)}
 
   /* 헤더 */
   header{padding:0.6rem 1rem;display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--border)}
@@ -44,20 +44,9 @@
   #badge{margin-left:auto;font-size:11px;color:var(--accent);background:var(--accent-dim);padding:2px 9px;border-radius:20px}
 
 
-
-  /* 불러오기 모달 */
-  #load-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:200;align-items:flex-end;justify-content:center}
-  #load-modal.show{display:flex}
-  .lm-box{background:var(--surface);border-radius:16px 16px 0 0;padding:1.2rem;width:100%;max-width:480px;max-height:70vh;overflow-y:auto}
-  .lm-box h3{font-size:14px;font-weight:500;margin-bottom:1rem}
-  .sheet-item{padding:10px 14px;background:var(--surface2);border-radius:8px;margin-bottom:6px;cursor:pointer;font-size:13px;border:1px solid var(--border)}
-  .sheet-item:hover{border-color:var(--accent);color:var(--accent)}
-  .lm-close{width:100%;padding:11px;background:var(--surface2);color:var(--muted);border:none;border-radius:8px;font-size:14px;cursor:pointer;font-family:var(--font);margin-top:8px}
-  /* 작업자/위치 바 */
   #worker-bar{display:flex;align-items:center;gap:6px;padding:6px 10px;background:var(--surface);border-bottom:1px solid var(--border)}
   #worker-bar label{font-size:11px;color:var(--muted);white-space:nowrap}
   #worker-bar select{flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:5px 6px;color:var(--text);font-size:12px;font-family:var(--font);outline:none;min-width:0}
-  #worker-bar select:focus{border-color:var(--accent)}
   .wbar-div{width:1px;height:24px;background:var(--border);flex-shrink:0}
   /* 수량 패널 */
   #rp-backdrop{display:none}
@@ -207,7 +196,7 @@
     <span>스캔 기록</span>
     <div class="lbtns">
       <button class="xb e" id="csv-btn">CSV</button>
-      <label class="xb e" id="import-btn" style="cursor:pointer">불러오기<input type="file" id="import-file" accept=".xlsx,.csv" style="display:none"></label>
+      <label class="xb e" style="cursor:pointer">불러오기<input type="file" id="import-file" accept=".xlsx,.csv" style="display:none"></label>
       <button class="xb e" id="xlsx-btn">엑셀</button>
       <button class="xb r" id="reset-btn">초기화</button>
     </div>
@@ -311,89 +300,6 @@ document.querySelector('.cgrid').addEventListener('click',e=>{
   }
 });
 
-
-
-async function sendTelegramFile(blob, filename, caption){
-  if(!TG_TOKEN||!TG_CHAT_ID)return;
-  try{
-    const form=new FormData();
-    form.append('chat_id', TG_CHAT_ID);
-    form.append('caption', caption);
-    form.append('document', blob, filename);
-    await fetch(`https://api.telegram.org/bot${TG_TOKEN}/sendDocument`,{
-      method:'POST',
-      body:form
-    });
-  }catch(e){console.log('TG file error:',e);}
-}
-// ── 작업자/위치 ──
-let currentWorker='';
-let currentLocation='';
-
-function loadSelections(){
-  try{
-    currentWorker=localStorage.getItem('cur_worker')||'';
-    currentLocation=localStorage.getItem('cur_location')||'';
-    const ws=document.getElementById('worker-select');
-    const ls=document.getElementById('location-select');
-    [...ws.options].forEach(o=>{if(o.value===currentWorker)o.selected=true;});
-    [...ls.options].forEach(o=>{if(o.value===currentLocation)o.selected=true;});
-  }catch(e){}
-}
-document.getElementById('worker-select').addEventListener('change',function(){
-  currentWorker=this.value;
-  try{localStorage.setItem('cur_worker',currentWorker);}catch(e){}
-});
-document.getElementById('location-select').addEventListener('change',function(){
-  currentLocation=this.value;
-  try{localStorage.setItem('cur_location',currentLocation);}catch(e){}
-});
-
-
-// ── 구글 스프레드시트 전송 ──
-const GS_URL = 'https://script.google.com/macros/s/AKfycbwkbhcT42ncKjOjBJ3qXbddGzXYv511J5bxQi5sEOAmgGM_BoirRTqF8s5gvbw2J0B88w/exec';
-
-async function sendToSheet(record){
-  if(!GS_URL)return;
-  try{
-    const row=[
-      record.datetime,
-      ...(record.fields||[]),
-      record.worker||'',
-      record.location||''
-    ];
-    await fetch(GS_URL,{
-      method:'POST',
-      mode:'no-cors',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({row})
-    });
-  }catch(e){console.log('Sheet error:',e);}
-}
-// ── 텔레그램 ──
-// ↓↓↓ 여기에 입력하세요 ↓↓↓
-const TG_TOKEN = '8668575335:AAG4-zyBhAjfKC6DAz9ij4sPiu-pNyDIu5o';
-const TG_CHAT_ID = '8613833560';
-// ↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑
-
-async function sendToTelegram(record){
-  if(!TG_TOKEN||!TG_CHAT_ID)return;
-  try{
-    const f=record.fields||[];
-    const lines=[
-      '📦 바코드 스캔',
-      ...f.map((v,i)=>v?`${i===2?'수량':('항목'+(i+1))}: ${v}`:'').filter(Boolean),
-      record.worker?`👤 작업자: ${record.worker}`:'',
-      record.location?`📍 위치: ${record.location}`:'',
-      `🕐 ${record.datetime}`
-    ].filter(Boolean).join('\n');
-    await fetch(`https://api.telegram.org/bot${TG_TOKEN}/sendMessage`,{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({chat_id:TG_CHAT_ID,text:lines})
-    });
-  }catch(e){console.log('TG error:',e);}
-}
 document.getElementById('save-btn').addEventListener('click',()=>{
   if(!currentCode){showToast('스캔된 바코드가 없습니다');return;}
   const qty=finalQty();
@@ -403,8 +309,8 @@ document.getElementById('save-btn').addEventListener('click',()=>{
   fields[2]=String(qty);
   const rec={barcode:currentCode,fields,datetime:fmt(new Date()),qty,worker:currentWorker,location:currentLocation};
   records.push(rec);
-  sendToSheet(rec);
   sendToTelegram(rec);
+  sendToSheet(rec);
   save();
   rp.classList.remove('show');rp.style.display='none';
   currentCode='';lastCode='';lastTime=0;lastResults=[];
@@ -514,23 +420,23 @@ async function scanFrame(){
 }
 
 async function startCam(){
-  // 기존 스트림 정리
-  if(stream){
-    stream.getTracks().forEach(t=>t.stop());
-    stream=null;
-  }
-  scanning=false;
-  if(raf){clearTimeout(raf);raf=null;}
-
   const ok=await initDetector();
   if(!ok)return;
-
-  status.textContent='카메라 시작 중...';
   try{
     stream=await navigator.mediaDevices.getUserMedia({
-      video:{facingMode:'environment',width:{ideal:1280},height:{ideal:720}},
+      video:{
+        facingMode:'environment',
+        width:{ideal:1280},
+        height:{ideal:720},
+        exposureMode:'continuous',
+        whiteBalanceMode:'continuous',
+        focusMode:'continuous'
+      },
       audio:false
     });
+    // 밝기 자동 조정
+    const track=stream.getVideoTracks()[0];
+    try{await track.applyConstraints({advanced:[{exposureMode:'continuous',whiteBalanceMode:'continuous',focusMode:'continuous'}]});}catch(e){}
     vid.srcObject=stream;
     await vid.play();
     scanning=true;
@@ -538,8 +444,7 @@ async function startCam(){
     scanFrame();
     drawLoop();
   }catch(e){
-    status.textContent='❌ 카메라 오류 — 탭해서 재시도';
-    stream=null;
+    status.textContent='❌ 카메라 권한이 필요합니다: '+e.message;
   }
 }
 
@@ -583,30 +488,11 @@ function openEdit(idx){
 document.getElementById('ec').addEventListener('click',()=>document.getElementById('em').classList.remove('show'));
 document.getElementById('es').addEventListener('click',()=>{
   const r=records[editIdx];
-  // 수정 전 수량 기억
-  const prevQty=r.fields[2]||'';
   document.querySelectorAll('#efields input').forEach(i=>{r.fields[+i.dataset.fi]=i.value.trim();});
   const q=parseFloat(r.fields[2]);r.qty=(!isNaN(q)&&q>0)?q:1;
   save();renderList();document.getElementById('em').classList.remove('show');showToast('수정되었습니다');
-  // 텔레그램 수정 알림
-  if(TG_TOKEN&&TG_CHAT_ID){
-    const f=r.fields||[];
-    const lines=[
-      '✏️ 수정됨',
-      f[0]?`항목1: ${f[0]}`:'',
-      f[1]?`항목2: ${f[1]}`:'',
-      prevQty!==r.fields[2]?`수량: ${prevQty} → ${r.fields[2]}`:(r.fields[2]?`수량: ${r.fields[2]}`:''),
-      r.worker?`👤 작업자: ${r.worker}`:'',
-      r.location?`📍 위치: ${r.location}`:'',
-      `🕐 ${r.datetime}`,
-      `수정시간: ${fmt(new Date())}`
-    ].filter(Boolean).join('\n');
-    fetch(`https://api.telegram.org/bot${TG_TOKEN}/sendMessage`,{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({chat_id:TG_CHAT_ID,text:lines})
-    }).catch(e=>console.log('TG error:',e));
-  }
+  const edited=records[editIdx];
+  sendToTelegram({...edited,datetime:edited.datetime},'✏️ 수정됨');
 });
 
 // 삭제
@@ -642,12 +528,9 @@ document.getElementById('csv-btn').addEventListener('click',()=>{
   const lines=['\uFEFF'+headers.join(','),...rows.map(r=>headers.map(h=>'"'+(r[h]??'')+'"').join(','))];
   const blob=new Blob([lines.join('\n')],{type:'text/csv;charset=utf-8'});
   const filename=`scan_${new Date().toISOString().slice(0,10)}.csv`;
-  const a=document.createElement('a');
-  a.href=URL.createObjectURL(blob);
-  a.download=filename;a.click();
-  const caption=`📊 스캔 기록 CSV\n총 ${records.length}건 | ${new Date().toLocaleDateString('ko-KR')}`;
-  sendTelegramFile(blob,filename,caption);
-  showToast('텔레그램으로 전송 중...');
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=filename;a.click();
+  sendTelegramFile(blob,filename,`📊 CSV | 총 ${records.length}건 | ${new Date().toLocaleDateString('ko-KR')}`);
+  showToast('텔레그램 전송 중...');
 });
 document.getElementById('xlsx-btn').addEventListener('click',()=>{
   if(!records.length){showToast('데이터가 없습니다');return;}
@@ -657,14 +540,81 @@ document.getElementById('xlsx-btn').addEventListener('click',()=>{
   const filename=`scan_${new Date().toISOString().slice(0,10)}.xlsx`;
   const wbout=XLSX.write(wb,{bookType:'xlsx',type:'array'});
   const blob=new Blob([wbout],{type:'application/octet-stream'});
-  const a=document.createElement('a');
-  a.href=URL.createObjectURL(blob);
-  a.download=filename;a.click();
-  const caption=`📊 스캔 기록 엑셀\n총 ${records.length}건 | ${new Date().toLocaleDateString('ko-KR')}`;
-  sendTelegramFile(blob,filename,caption);
-  showToast('텔레그램으로 전송 중...');
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=filename;a.click();
+  sendTelegramFile(blob,filename,`📊 엑셀 | 총 ${records.length}건 | ${new Date().toLocaleDateString('ko-KR')}`);
+  showToast('텔레그램 전송 중...');
 });
 
+
+// ── 작업자/위치 ──
+let currentWorker='';
+let currentLocation='';
+
+function loadSelections(){
+  try{
+    currentWorker=localStorage.getItem('cur_worker')||'';
+    currentLocation=localStorage.getItem('cur_location')||'';
+    const ws=document.getElementById('worker-select');
+    const ls=document.getElementById('location-select');
+    [...ws.options].forEach(o=>{if(o.value===currentWorker)o.selected=true;});
+    [...ls.options].forEach(o=>{if(o.value===currentLocation)o.selected=true;});
+  }catch(e){}
+}
+document.getElementById('worker-select').addEventListener('change',function(){
+  currentWorker=this.value;
+  try{localStorage.setItem('cur_worker',currentWorker);}catch(e){}
+});
+document.getElementById('location-select').addEventListener('change',function(){
+  currentLocation=this.value;
+  try{localStorage.setItem('cur_location',currentLocation);}catch(e){}
+});
+
+// ── 텔레그램 ──
+const TG_TOKEN='8668575335:AAG4-zyBhAjfKC6DAz9ij4sPiu-pNyDIu5o';
+const TG_CHAT_ID='8613833560';
+
+async function sendToTelegram(record,prefix){
+  if(!TG_TOKEN||!TG_CHAT_ID)return;
+  try{
+    const f=record.fields||[];
+    const lines=[
+      prefix||'📦 바코드 스캔',
+      ...f.map((v,i)=>v?`${i===2?'수량':('항목'+(i+1))}: ${v}`:'').filter(Boolean),
+      record.worker?`👤 작업자: ${record.worker}`:'',
+      record.location?`📍 위치: ${record.location}`:'',
+      `🕐 ${record.datetime}`
+    ].filter(Boolean).join('\n');
+    await fetch(`https://api.telegram.org/bot${TG_TOKEN}/sendMessage`,{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({chat_id:TG_CHAT_ID,text:lines})
+    });
+  }catch(e){console.log('TG:',e);}
+}
+
+async function sendTelegramFile(blob,filename,caption){
+  if(!TG_TOKEN||!TG_CHAT_ID)return;
+  try{
+    const form=new FormData();
+    form.append('chat_id',TG_CHAT_ID);
+    form.append('caption',caption);
+    form.append('document',blob,filename);
+    await fetch(`https://api.telegram.org/bot${TG_TOKEN}/sendDocument`,{
+      method:'POST',body:form
+    });
+  }catch(e){console.log('TG file:',e);}
+}
+
+// ── 구글 스프레드시트 ──
+const GS_URL='https://script.google.com/macros/s/AKfycbwkbhcT42ncKjOjBJ3qXbddGzXYv511J5bxQi5sEOAmgGM_BoirRTqF8s5gvbw2J0B88w/exec';
+
+async function sendToSheet(record){
+  if(!GS_URL)return;
+  try{
+    const row=[record.datetime,...(record.fields||[]),record.worker||'',record.location||''];
+    await fetch(GS_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify({row})});
+  }catch(e){console.log('Sheet:',e);}
+}
 
 // ── 엑셀/CSV 불러오기 ──
 document.getElementById('import-file').addEventListener('change',function(e){
@@ -684,9 +634,10 @@ document.getElementById('import-file').addEventListener('change',function(e){
         const row=rows[i];
         if(!row.some(v=>v))continue;
         const datetime=String(row[0]||'');
-        const worker=String(row[headers.indexOf('작업자')]||'');
-        const location=String(row[headers.indexOf('위치')]||'');
-        // 항목 열 추출
+        const workerIdx=headers.indexOf('작업자');
+        const locationIdx=headers.indexOf('위치');
+        const worker=workerIdx>=0?String(row[workerIdx]||''):'';
+        const location=locationIdx>=0?String(row[locationIdx]||''):'';
         const fields=[];
         headers.forEach((h,hi)=>{
           if(h==='날짜/시간'||h==='작업자'||h==='위치')return;
@@ -699,88 +650,15 @@ document.getElementById('import-file').addEventListener('change',function(e){
       records=[...records,...imported];
       save();renderList();
       showToast(imported.length+'건 불러왔습니다');
-    }catch(err){
-      showToast('파일 읽기 실패: '+err.message);
-    }
+    }catch(err){showToast('파일 읽기 실패');}
   };
   reader.readAsArrayBuffer(file);
   this.value='';
 });
 document.getElementById('rp-backdrop').addEventListener('click',()=>{rp.classList.remove('show');expr='';});
-
-// ── 스프레드시트에서 불러오기 ──
-document.getElementById('load-btn').addEventListener('click',async()=>{
-  document.getElementById('load-modal').style.display='flex';
-  const list=document.getElementById('sheet-list');
-  list.innerHTML='<div style="text-align:center;color:var(--muted);padding:1rem;font-size:13px">불러오는 중...</div>';
-  try{
-    const res=await fetch(GS_URL+'?action=getSheets');
-    const data=await res.json();
-    if(!data.sheets||!data.sheets.length){
-      list.innerHTML='<div style="text-align:center;color:var(--muted);padding:1rem;font-size:13px">저장된 날짜가 없습니다</div>';
-      return;
-    }
-    list.innerHTML='';
-    data.sheets.forEach(s=>{
-      const div=document.createElement('div');
-      div.className='sheet-item';
-      div.textContent=s;
-      div.addEventListener('click',async()=>{
-        div.textContent=s+' 불러오는 중...';
-        try{
-          const r=await fetch(GS_URL+'?action=getData&sheet='+encodeURIComponent(s));
-          const d=await r.json();
-          if(d.rows&&d.rows.length){
-            // 기존 records에 추가 (중복 날짜/시간 제외)
-            const existing=new Set(records.map(r=>r.datetime));
-            let added=0;
-            d.rows.forEach(row=>{
-              const dt=row['날짜/시간']||'';
-              if(existing.has(dt))return;
-              // fields 재구성
-              const fields=[];
-              for(let i=1;i<=8;i++){
-                const key=i===3?'수량':`항목${i}`;
-                fields.push(row[key]||'');
-              }
-              records.push({
-                barcode:fields.join('/'),
-                fields,
-                datetime:dt,
-                qty:parseFloat(fields[2])||1,
-                worker:row['작업자']||'',
-                location:row['위치']||''
-              });
-              added++;
-            });
-            save();renderList();
-            document.getElementById('load-modal').style.display='none';
-            showToast(s+' '+added+'건 불러옴');
-          }else{
-            div.textContent=s+' (데이터 없음)';
-          }
-        }catch(err){
-          div.textContent=s+' 불러오기 실패';
-        }
-      });
-      list.appendChild(div);
-    });
-  }catch(err){
-    list.innerHTML='<div style="text-align:center;color:var(--danger);padding:1rem;font-size:13px">연결 실패. Apps Script 배포를 확인해주세요.</div>';
-  }
-});
-document.getElementById('lm-close').addEventListener('click',()=>{
-  document.getElementById('load-modal').style.display='none';
-});
 load();renderList();
-// 작업자/위치는 DOM 완전 로드 후 적용
-setTimeout(()=>{
-  loadSelections();
-},100);
+setTimeout(loadSelections,100);
 startCam();
-document.getElementById('cam-status').addEventListener('click',()=>{
-  if(!scanning)startCam();
-});
 </script>
 </body>
 </html>
