@@ -114,7 +114,6 @@
 
   /* 작업자 설정 모달 */
   #wm{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:200;align-items:flex-end;justify-content:center}
-  #wm.show{display:flex}
   .wbox{background:var(--surface);border-radius:16px 16px 0 0;padding:1.2rem;width:100%;max-width:480px;max-height:70vh;overflow-y:auto}
   .wbox h3{font-size:14px;font-weight:500;margin-bottom:1rem}
   .wadd-row{display:flex;gap:6px;margin-bottom:12px}
@@ -629,8 +628,8 @@ loadLocations();
 const SETTINGS_KEY='barcode_settings';
 // ↓↓↓ 여기에 직접 입력하세요 (한번만 설정하면 됨) ↓↓↓
 const DEFAULT_SETTINGS={
-  tgToken:'8668575335',      // 텔레그램 Bot Token 예: '123456:ABCdef'
-  tgChatId:'AAHZkLl1kn9PdLURso2Tg9tfyiPOiV6cMoo',     // 텔레그램 Chat ID 예: '-100123456'
+  tgToken:'',      // 텔레그램 Bot Token 예: '123456:ABCdef'
+  tgChatId:'',     // 텔레그램 Chat ID 예: '-100123456'
   gsUrl:'https://script.google.com/macros/s/AKfycbwkbhcT42ncKjOjBJ3qXbddGzXYv511J5bxQi5sEOAmgGM_BoirRTqF8s5gvbw2J0B88w/exec'
 };
 // ↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑
@@ -650,9 +649,9 @@ function renderSettingsForm(){
 
 document.getElementById('settings-btn').addEventListener('click',()=>{
   renderSettingsForm();
-  document.getElementById('sm').classList.add('show');
+  document.getElementById('sm').style.display='flex';
 });
-document.getElementById('s-close').addEventListener('click',()=>document.getElementById('sm').classList.remove('show'));
+document.getElementById('s-close').addEventListener('click',()=>document.getElementById('sm').style.display='none');
 document.getElementById('s-save').addEventListener('click',()=>{
   settings.tgToken=document.getElementById('s-tg-token').value.trim();
   settings.tgChatId=document.getElementById('s-tg-chatid').value.trim();
@@ -763,11 +762,9 @@ document.getElementById('location-select').addEventListener('change',function(){
 document.getElementById('location-manage').addEventListener('click',()=>{
   renderLocationList();
   document.getElementById('lm').style.display='flex';
-  document.getElementById('lm').classList.add('show');
 });
 document.getElementById('l-close').addEventListener('click',()=>{
   document.getElementById('lm').style.display='none';
-  document.getElementById('lm').classList.remove('show');
 });
 document.getElementById('l-add').addEventListener('click',()=>{
   const inp=document.getElementById('l-input');
@@ -850,10 +847,10 @@ document.getElementById('worker-select').addEventListener('change',function(){
 });
 document.getElementById('worker-manage').addEventListener('click',()=>{
   renderWorkerList();
-  document.getElementById('wm').classList.add('show');
+  document.getElementById('wm').style.display='flex';
 });
 document.getElementById('w-close').addEventListener('click',()=>{
-  document.getElementById('wm').classList.remove('show');
+  document.getElementById('wm').style.display='none';
 });
 document.getElementById('w-add').addEventListener('click',()=>{
   const inp=document.getElementById('w-input');
