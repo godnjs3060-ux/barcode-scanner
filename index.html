@@ -48,8 +48,8 @@
   #worker-bar label{font-size:11px;color:var(--muted);white-space:nowrap}
   #worker-bar select{flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:5px 6px;color:var(--text);font-size:12px;font-family:var(--font);outline:none;min-width:0}
   .wdiv{width:1px;height:24px;background:var(--border);flex-shrink:0}
-  #manual-btn{display:block;width:100%;padding:9px;background:var(--surface2);color:var(--muted);border:none;border-top:1px solid var(--border);font-size:13px;cursor:pointer;font-family:var(--font)}
   #cam-start-btn{display:block;width:100%;padding:11px;background:var(--accent);color:#000;border:none;font-size:14px;font-weight:500;font-family:var(--font);cursor:pointer}
+  #manual-btn{display:block;width:100%;padding:9px;background:var(--surface2);color:var(--muted);border:none;border-top:1px solid var(--border);font-size:13px;cursor:pointer;font-family:var(--font)}
   /* 수량 패널 */
   #rp-backdrop{display:none}
   #rp{display:none;position:fixed;bottom:0;left:0;right:0;background:var(--surface);border-top:2px solid var(--accent);border-radius:16px 16px 0 0;z-index:50;overflow:hidden;padding-bottom:env(safe-area-inset-bottom,8px)}
@@ -141,31 +141,16 @@
 
   <header>
     <div class="logo"><svg viewBox="0 0 20 20"><rect x="2" y="2" width="3" height="16" rx="1"/><rect x="7" y="2" width="1.5" height="16" rx="0.5"/><rect x="10" y="2" width="3" height="16" rx="1"/><rect x="15" y="2" width="1.5" height="16" rx="0.5"/></svg></div>
-    <h1>바코드 스캐너 <span style="font-size:10px;color:var(--muted);font-weight:400">v1.5</span></h1>
+    <h1>바코드 스캐너 <span style="font-size:10px;color:var(--muted);font-weight:400">v1.6</span></h1>
     <div id="badge">0건</div>
   </header>
 
   <div id="worker-bar">
     <label>👤</label>
-    <select id="worker-select">
-      <option value="">작업자 선택</option>
-      <option>정해원</option>
-      <option>온한섭</option>
-      <option>조민호</option>
-      <option>정해석</option>
-      <option>작업자1</option>
-      <option>작업자2</option>
-    </select>
+    <select id="worker-select"><option value="">작업자 선택</option><option>정해원</option><option>온한섭</option><option>조민호</option><option>정해석</option><option>작업자1</option><option>작업자2</option></select>
     <div class="wdiv"></div>
     <label>📍</label>
-    <select id="location-select">
-      <option value="">위치 선택</option>
-      <option>매장</option>
-      <option>1번냉동</option>
-      <option>2번냉동</option>
-      <option>3번냉동</option>
-      <option>4번냉동</option>
-    </select>
+    <select id="location-select"><option value="">위치 선택</option><option>매장</option><option>1번냉동</option><option>2번냉동</option><option>3번냉동</option><option>4번냉동</option></select>
   </div>
   <div id="rp-backdrop"></div>
   <div id="rp">
@@ -532,25 +517,24 @@ document.getElementById('csv-btn').addEventListener('click',()=>{
   const{headers,rows}=buildRows();
   const lines=['\uFEFF'+headers.join(','),...rows.map(r=>headers.map(h=>'"'+(r[h]??'')+'"').join(','))];
   const a=document.createElement('a');
-  const csvBlob=new Blob([lines.join('\n')],{type:'text/csv;charset=utf-8'});
-  const csvName=makeFilename('csv');
-  const ca=document.createElement('a');ca.href=URL.createObjectURL(csvBlob);ca.download=csvName;ca.click();
-  sendTelegramFile(csvBlob,csvName,`📊 CSV | 총 ${records.length}건 | ${new Date().toLocaleDateString('ko-KR')}`);
+  const cb=new Blob([lines.join('\n')],{type:'text/csv;charset=utf-8'});
+  const cn=makeFilename('csv');
+  const ca=document.createElement('a');ca.href=URL.createObjectURL(cb);ca.download=cn;ca.click();
+  sendTelegramFile(cb,cn,'📊 CSV | 총 '+records.length+'건');
 });
 document.getElementById('xlsx-btn').addEventListener('click',()=>{
   if(!records.length){showToast('데이터가 없습니다');return;}
   const{rows}=buildRows();
   const ws=XLSX.utils.json_to_sheet(rows);
   const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'스캔기록');
-  const xlsxName=makeFilename('xlsx');
-  const wbout=XLSX.write(wb,{bookType:'xlsx',type:'array'});
-  const xlsxBlob=new Blob([wbout],{type:'application/octet-stream'});
-  const xa=document.createElement('a');xa.href=URL.createObjectURL(xlsxBlob);xa.download=xlsxName;xa.click();
-  sendTelegramFile(xlsxBlob,xlsxName,`📊 엑셀 | 총 ${records.length}건 | ${new Date().toLocaleDateString('ko-KR')}`);
+  const xn=makeFilename('xlsx');
+  const xb=new Blob([XLSX.write(wb,{bookType:'xlsx',type:'array'})],{type:'application/octet-stream'});
+  const xa=document.createElement('a');xa.href=URL.createObjectURL(xb);xa.download=xn;xa.click();
+  sendTelegramFile(xb,xn,'📊 엑셀 | 총 '+records.length+'건');
 });
 
 
-let currentWorker='',currentLocation='';
+let currentWorker='', currentLocation='';
 
 function loadSelections(){
   try{
@@ -573,22 +557,26 @@ document.getElementById('location-select').addEventListener('change',function(){
 
 const TG_TOKEN='8668575335:AAG4-zyBhAjfKC6DAz9ij4sPiu-pNyDIu5o';
 const TG_CHAT_ID='8613833560';
+
 async function sendToTelegram(rec,prefix){
   if(!TG_TOKEN||!TG_CHAT_ID)return;
   try{
     const f=rec.fields||[];
     const fn=['바코드','품명','수량','비고','시트명','파레트위치','구분','업체명'];
-    const lines=[prefix,...f.map((v,i)=>v?(fn[i]||('항목'+(i+1)))+': '+v:'').filter(Boolean),
+    const lines=[prefix,
+      ...f.map((v,i)=>v?(fn[i]||'항목'+(i+1))+': '+v:'').filter(Boolean),
       rec.worker?'👤 작업자: '+rec.worker:'',
       rec.location?'📍 위치: '+rec.location:'',
       '🕐 '+rec.datetime
-    ].filter(Boolean).join('\n');
+    ].filter(Boolean).join('
+');
     await fetch('https://api.telegram.org/bot'+TG_TOKEN+'/sendMessage',{
       method:'POST',headers:{'Content-Type':'application/json'},
       body:JSON.stringify({chat_id:TG_CHAT_ID,text:lines})
     });
   }catch(e){}
 }
+
 async function sendTelegramFile(blob,filename,caption){
   if(!TG_TOKEN||!TG_CHAT_ID)return;
   try{
@@ -599,6 +587,7 @@ async function sendTelegramFile(blob,filename,caption){
     await fetch('https://api.telegram.org/bot'+TG_TOKEN+'/sendDocument',{method:'POST',body:form});
   }catch(e){}
 }
+
 const GS_URL='https://script.google.com/macros/s/AKfycbwkbhcT42ncKjOjBJ3qXbddGzXYv511J5bxQi5sEOAmgGM_BoirRTqF8s5gvbw2J0B88w/exec';
 async function sendToSheet(rec){
   try{
@@ -606,6 +595,7 @@ async function sendToSheet(rec){
     await fetch(GS_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify({row})});
   }catch(e){}
 }
+
 function makeFilename(ext){
   const now=new Date(),p=n=>String(n).padStart(2,'0');
   return '재고파악_'+(currentWorker||'작업자없음')+'_'+now.getFullYear()+'-'+p(now.getMonth()+1)+'-'+p(now.getDate())+'_'+p(now.getHours())+'_'+p(now.getMinutes())+'.'+ext;
@@ -620,9 +610,7 @@ document.getElementById('cam-start-btn').addEventListener('click',()=>{
 
 // 수기입력
 document.getElementById('manual-btn').addEventListener('click',()=>{
-  ['m-f0','m-f1','m-f2','m-f3','m-f4','m-f5','m-f6','m-f7'].forEach(id=>{
-    document.getElementById(id).value='';
-  });
+  ['m-f0','m-f1','m-f2','m-f3','m-f4','m-f5','m-f6','m-f7'].forEach(id=>{document.getElementById(id).value='';});
   document.getElementById('mm').style.display='flex';
   setTimeout(()=>document.getElementById('m-f0').focus(),100);
 });
@@ -633,7 +621,7 @@ document.getElementById('m-ok').addEventListener('click',()=>{
   const vals=['m-f0','m-f1','m-f2','m-f3','m-f4','m-f5','m-f6','m-f7'].map(id=>document.getElementById(id).value.trim());
   if(!vals.some(v=>v)){showToast('최소 한 항목을 입력해주세요');return;}
   document.getElementById('mm').style.display='none';
-  // 중복체크 초기화 후 패널 직접 열기
+  // 중복체크 초기화 후 수량패널 직접 열기
   lastCode='';lastTime=0;
   const code=vals.join('/');
   currentCode=code;
@@ -674,18 +662,11 @@ document.getElementById('import-file').addEventListener('change',function(e){
   };
   reader.readAsArrayBuffer(file);this.value='';
 });
+
 document.getElementById('rp-backdrop').addEventListener('click',()=>{rp.classList.remove('show');expr='';});
 load();renderList();
 setTimeout(loadSelections,50);
 </script>
-
-    <div class="erow"><label>품명</label><input type="text" class="" data-mfi="1" placeholder=""></div>
-    <div class="erow"><label>수량</label><input type="number" class="qi" data-mfi="2" placeholder=""></div>
-    <div class="erow"><label>비고</label><input type="text" class="" data-mfi="3" placeholder=""></div>
-    <div class="erow"><label>시트명</label><input type="text" class="" data-mfi="4" placeholder=""></div>
-    <div class="erow"><label>파레트위치</label><input type="text" class="" data-mfi="5" placeholder=""></div>
-    <div class="erow"><label>구분</label><input type="text" class="" data-mfi="6" placeholder=""></div>
-    <div class="erow"><label>업체명</label><input type="text" class="" data-mfi="7" placeholder=""></div>
 
 <!-- 수기입력 모달 -->
 <div id="mm" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:200;align-items:flex-end;justify-content:center">
