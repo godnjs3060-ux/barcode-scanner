@@ -48,8 +48,9 @@
   #worker-bar label{font-size:11px;color:var(--muted);white-space:nowrap}
   #worker-bar select{flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:5px 6px;color:var(--text);font-size:12px;font-family:var(--font);outline:none;min-width:0}
   .wbar-div{width:1px;height:24px;background:var(--border);flex-shrink:0}
-  #mm{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:200;align-items:flex-end;justify-content:center}
-  #mm.show{display:flex}
+  #mm{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:200}
+  #mm.show{display:block}
+  #mm .mbox2{position:absolute;bottom:0;left:0;right:0;max-height:70vh;overflow-y:auto;border-radius:16px 16px 0 0}
   .mbox2{background:var(--surface);border-radius:16px 16px 0 0;padding:1.2rem;width:100%;max-width:480px;max-height:80vh;overflow-y:auto}
   .mbox2 h3{font-size:14px;font-weight:500;margin-bottom:1rem}
   .mbox2 input{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:7px;padding:10px 12px;color:var(--text);font-size:14px;font-family:var(--mono);outline:none;margin-bottom:1rem}
@@ -252,13 +253,11 @@ let records=[],expr='',defQty=1,editIdx=-1,delIdx=-1,currentCode='';
 let stream=null,raf=null,scanning=false,detector=null,lastCode='',lastTime=0;
 
 // storage
-function save(){try{localStorage.setItem(SK,JSON.stringify(records));localStorage.setItem('barcode_records_v3',JSON.stringify(records));}catch(e){}}
+function save(){try{localStorage.setItem(SK,JSON.stringify(records));}catch(e){}}
 function load(){
   try{
-    for(const k of[SK,'barcode_records_v3','barcode_records_v2','barcode_records_v1']){
-      const d=localStorage.getItem(k);
-      if(d){records=JSON.parse(d);break;}
-    }
+    const d=localStorage.getItem(SK);
+    if(d)records=JSON.parse(d);
     records=records.map(r=>{if(!r.fields)r.fields=split(r.barcode||'');return r;});
   }catch(e){records=[];}
 }
