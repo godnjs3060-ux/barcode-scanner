@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#111111">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="바코드 스캐너">
+<meta name="apple-mobile-web-app-title" content="바코드 스캐너3.24_1">
 <title>바코드 스캐너</title>
 <link rel="manifest" href="manifest.json">
 <style>
@@ -689,7 +689,13 @@ setTimeout(loadSelections,50);
 <!-- 수기입력 모달 -->
 <div id="mm" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:200;align-items:flex-end;justify-content:center">
   <div class="ebox">
-    <h3>✏️ 수기입력</h3>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.75rem">
+      <h3 style="margin:0">✏️ 수기입력</h3>
+      <div style="display:flex;gap:8px">
+        <button class="enc" id="m-cancel" style="padding:7px 16px">취소</button>
+        <button class="eok" id="m-ok" style="padding:7px 16px">확인</button>
+      </div>
+    </div>
     <div class="erow"><label>바코드</label><input type="text" id="m-f0" placeholder="*GA0014*"></div>
     <div class="erow"><label>품명</label><input type="text" id="m-f1" placeholder="특딱파"></div>
     <div class="erow"><label style="color:var(--accent);font-weight:500">수량</label><input type="number" id="m-f2" class="qi" placeholder="8"></div>
@@ -698,10 +704,6 @@ setTimeout(loadSelections,50);
     <div class="erow"><label>파레트위치</label><input type="text" id="m-f5" placeholder=""></div>
     <div class="erow"><label>구분</label><input type="text" id="m-f6" placeholder=""></div>
     <div class="erow"><label>업체명</label><input type="text" id="m-f7" placeholder=""></div>
-    <div class="eacts">
-      <button class="enc" id="m-cancel">취소</button>
-      <button class="eok" id="m-ok">확인</button>
-    </div>
   </div>
 </div>
 </body>
