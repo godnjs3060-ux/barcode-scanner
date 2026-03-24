@@ -492,19 +492,9 @@ async function startCam(){
   if(!ok)return;
   try{
     stream=await navigator.mediaDevices.getUserMedia({
-      video:{
-        facingMode:'environment',
-        width:{ideal:1280},
-        height:{ideal:720},
-        exposureMode:'continuous',
-        whiteBalanceMode:'continuous',
-        focusMode:'continuous'
-      },
+      video:{facingMode:'environment',width:{ideal:1280},height:{ideal:720}},
       audio:false
     });
-    // 밝기 자동 조정
-    const track=stream.getVideoTracks()[0];
-    try{await track.applyConstraints({advanced:[{exposureMode:'continuous',whiteBalanceMode:'continuous',focusMode:'continuous'}]});}catch(e){}
     vid.srcObject=stream;
     await vid.play();
     scanning=true;
