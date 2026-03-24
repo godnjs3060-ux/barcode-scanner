@@ -176,22 +176,21 @@
     <button id="settings-btn" style="background:none;border:none;color:var(--muted);font-size:18px;cursor:pointer;padding:0 4px">⚙️</button>
   </header>
 
-  <div id="worker-bar" style="display:flex;align-items:center;gap:6px;padding:6px 10px;background:var(--surface);border-bottom:1px solid var(--border);position:relative;z-index:20">
+  <div id="worker-bar" style="display:flex;align-items:center;gap:6px;padding:6px 10px;background:var(--surface);border-bottom:1px solid var(--border)">
     <div style="display:flex;align-items:center;gap:4px;flex:1">
-      <label id="worker-label" style="font-size:11px;color:var(--muted);white-space:nowrap">작업자</label>
-      <select id="worker-select" style="flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:4px 6px;color:var(--text);font-size:12px;font-family:var(--font);outline:none;min-width:0">
-        <option value="">-- 선택 --</option>
+      <label style="font-size:11px;color:var(--muted);white-space:nowrap">👤</label>
+      <select id="worker-select" style="flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:5px 6px;color:var(--text);font-size:12px;font-family:var(--font);outline:none;min-width:0">
+        <option value="">작업자 선택</option>
       </select>
-      <button id="worker-manage" style="padding:4px 8px;background:var(--surface2);color:var(--muted);border:1px solid var(--border);border-radius:6px;font-size:11px;cursor:pointer;white-space:nowrap;font-family:var(--font)">관리</button>
     </div>
     <div style="width:1px;height:24px;background:var(--border);flex-shrink:0"></div>
     <div style="display:flex;align-items:center;gap:4px;flex:1">
-      <label id="location-label" style="font-size:11px;color:var(--muted);white-space:nowrap">위치</label>
-      <select id="location-select" style="flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:4px 6px;color:var(--text);font-size:12px;font-family:var(--font);outline:none;min-width:0">
-        <option value="">-- 선택 --</option>
+      <label style="font-size:11px;color:var(--muted);white-space:nowrap">📍</label>
+      <select id="location-select" style="flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:5px 6px;color:var(--text);font-size:12px;font-family:var(--font);outline:none;min-width:0">
+        <option value="">위치 선택</option>
       </select>
-      <button id="location-manage" style="padding:4px 8px;background:var(--surface2);color:var(--muted);border:1px solid var(--border);border-radius:6px;font-size:11px;cursor:pointer;white-space:nowrap;font-family:var(--font)">관리</button>
     </div>
+    <button id="refresh-btn" style="padding:5px 8px;background:var(--surface2);color:var(--muted);border:1px solid var(--border);border-radius:6px;font-size:13px;cursor:pointer">🔄</button>
   </div>
   <div id="rp-backdrop"></div>
   <div id="rp">
@@ -234,19 +233,6 @@
 </div>
 
 
-
-<!-- 위치 관리 모달 -->
-<div id="lm" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:200;align-items:flex-end;justify-content:center">
-  <div class="wbox">
-    <h3>위치 관리</h3>
-    <div class="wadd-row">
-      <input type="text" id="l-input" placeholder="위치 이름 입력">
-      <button id="l-add">추가</button>
-    </div>
-    <div class="wlist" id="llist"></div>
-    <button class="wclose" id="l-close">닫기</button>
-  </div>
-</div>
 <!-- 설정 모달 -->
 <div id="sm">
   <div class="sbox">
@@ -273,18 +259,6 @@
 
     <button class="ssave" id="s-save">저장</button>
     <button class="sclose" id="s-close">닫기</button>
-  </div>
-</div>
-<!-- 작업자 관리 모달 -->
-<div id="wm">
-  <div class="wbox">
-    <h3>작업자 관리</h3>
-    <div class="wadd-row">
-      <input type="text" id="w-input" placeholder="작업자 이름 입력">
-      <button id="w-add">추가</button>
-    </div>
-    <div class="wlist" id="wlist"></div>
-    <button class="wclose" id="w-close">닫기</button>
   </div>
 </div>
 <!-- 수정 모달 -->
@@ -621,7 +595,6 @@ document.getElementById('xlsx-btn').addEventListener('click',()=>{
 document.getElementById('rp-backdrop').addEventListener('click',()=>{rp.classList.remove('show');expr='';});
 load();renderList();
 loadSettings();
-loadLocations();
 
 
 // ── 설정 ──
@@ -694,93 +667,66 @@ async function sendToTelegram(record){
   }catch(e){console.log('Telegram error:',e);}
 }
 
-// ── 위치 설정 ──
-const LOCATION_KEY='barcode_locations';
-const LOCATION_CUR='barcode_current_location';
+
+// ── 작업자/위치 (구글 스프레드시트에서 로드) ──
+let currentWorker='';
 let currentLocation='';
-let locationList=[];
 
-function loadLocations(){
+function loadSelections(){
   try{
-    const w=localStorage.getItem(LOCATION_KEY);
-    if(w)locationList=JSON.parse(w);
-    currentLocation=localStorage.getItem(LOCATION_CUR)||'';
+    currentWorker=localStorage.getItem('cur_worker')||'';
+    currentLocation=localStorage.getItem('cur_location')||'';
   }catch(e){}
 }
-function saveLocations(){
+function saveSelections(){
   try{
-    localStorage.setItem(LOCATION_KEY,JSON.stringify(locationList));
-    localStorage.setItem(LOCATION_CUR,currentLocation);
+    localStorage.setItem('cur_worker',currentWorker);
+    localStorage.setItem('cur_location',currentLocation);
   }catch(e){}
 }
-function renderLocationSelect(){
-  const sel=document.getElementById('location-select');
-  sel.innerHTML='<option value="">-- 선택 --</option>';
-  locationList.forEach(w=>{
-    const opt=document.createElement('option');
-    opt.value=w;opt.textContent=w;
-    if(w===currentLocation)opt.selected=true;
-    sel.appendChild(opt);
-  });
-  updateLocationBar();
-}
-function updateLocationBar(){
-  const lbl=document.getElementById('location-label');
-  lbl.textContent=currentLocation?('📍 '+currentLocation):'위치';
-  lbl.style.color=currentLocation?'var(--warn)':'var(--muted)';
-}
-function renderLocationList(){
-  const list=document.getElementById('llist');
-  if(!locationList.length){
-    list.innerHTML='<div style="text-align:center;color:var(--muted);font-size:13px;padding:1rem">등록된 위치가 없습니다</div>';
-    return;
-  }
-  list.innerHTML='';
-  locationList.forEach((w,i)=>{
-    const item=document.createElement('div');
-    item.className='witem'+(w===currentLocation?' active':'');
-    item.innerHTML='<span class="witem-name'+(w===currentLocation?' sel':'')+'" data-name="'+w+'">'+w+(w===currentLocation?' ✓':'')+'</span><button class="wdel" data-i="'+i+'">삭제</button>';
-    list.appendChild(item);
-  });
-  list.querySelectorAll('.witem-name').forEach(el=>el.addEventListener('click',()=>{
-    currentLocation=el.dataset.name;
-    saveLocations();renderLocationSelect();renderLocationList();
-    showToast('위치: '+currentLocation);
-  }));
-  list.querySelectorAll('.wdel').forEach(btn=>btn.addEventListener('click',()=>{
-    const idx=+btn.dataset.i;
-    if(locationList[idx]===currentLocation)currentLocation='';
-    locationList.splice(idx,1);
-    saveLocations();renderLocationSelect();renderLocationList();
-  }));
+
+async function loadListsFromSheet(){
+  if(!settings.gsUrl)return;
+  try{
+    const url=settings.gsUrl+'?action=getLists';
+    const res=await fetch(url,{method:'GET',mode:'cors'});
+    const data=await res.json();
+    if(data.workers){
+      const ws=document.getElementById('worker-select');
+      ws.innerHTML='<option value="">작업자 선택</option>';
+      data.workers.forEach(w=>{
+        const o=document.createElement('option');
+        o.value=w;o.textContent=w;
+        if(w===currentWorker)o.selected=true;
+        ws.appendChild(o);
+      });
+    }
+    if(data.locations){
+      const ls=document.getElementById('location-select');
+      ls.innerHTML='<option value="">위치 선택</option>';
+      data.locations.forEach(l=>{
+        const o=document.createElement('option');
+        o.value=l;o.textContent=l;
+        if(l===currentLocation)o.selected=true;
+        ls.appendChild(o);
+      });
+    }
+  }catch(e){showToast('목록 불러오기 실패');}
 }
 
+document.getElementById('worker-select').addEventListener('change',function(){
+  currentWorker=this.value;saveSelections();
+});
 document.getElementById('location-select').addEventListener('change',function(){
-  currentLocation=this.value;
-  saveLocations();updateLocationBar();
+  currentLocation=this.value;saveSelections();
 });
-document.getElementById('location-manage').addEventListener('click',()=>{
-  renderLocationList();
-  document.getElementById('lm').style.display='flex';
+document.getElementById('refresh-btn').addEventListener('click',()=>{
+  showToast('목록 새로고침 중...');
+  loadListsFromSheet();
 });
-document.getElementById('l-close').addEventListener('click',()=>{
-  document.getElementById('lm').style.display='none';
-});
-document.getElementById('l-add').addEventListener('click',()=>{
-  const inp=document.getElementById('l-input');
-  const name=inp.value.trim();
-  if(!name){showToast('위치를 입력해주세요');return;}
-  if(locationList.includes(name)){showToast('이미 있는 위치예요');return;}
-  locationList.push(name);
-  if(!currentLocation)currentLocation=name;
-  saveLocations();renderLocationSelect();renderLocationList();
-  inp.value='';
-  showToast(name+' 추가됨');
-});
-document.getElementById('l-input').addEventListener('keydown',e=>{
-  if(e.key==='Enter')document.getElementById('l-add').click();
-});
-// ── 작업자 설정 ──
+
+loadSelections();
+
 const WORKER_KEY='barcode_workers';
 const WORKER_CUR='barcode_current_worker';
 let currentWorker='';
@@ -867,8 +813,7 @@ document.getElementById('w-input').addEventListener('keydown',e=>{
   if(e.key==='Enter')document.getElementById('w-add').click();
 });
 
-loadWorkers();renderWorkerSelect();
-loadLocations();renderLocationSelect();
+loadListsFromSheet();
 startCam();
 </script>
 </body>
