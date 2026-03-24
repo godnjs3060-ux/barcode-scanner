@@ -111,6 +111,24 @@
   .eok{background:var(--accent);color:#000}
 
 
+
+  /* 작업자 설정 모달 */
+  #wm{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:200;align-items:flex-end;justify-content:center}
+  #wm.show{display:flex}
+  .wbox{background:var(--surface);border-radius:16px 16px 0 0;padding:1.2rem;width:100%;max-width:480px;max-height:70vh;overflow-y:auto}
+  .wbox h3{font-size:14px;font-weight:500;margin-bottom:1rem}
+  .wadd-row{display:flex;gap:6px;margin-bottom:12px}
+  .wadd-row input{flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:7px;padding:8px 10px;color:var(--text);font-size:13px;outline:none;font-family:var(--font)}
+  .wadd-row input:focus{border-color:var(--accent)}
+  .wadd-row button{padding:8px 14px;background:var(--accent);color:#000;border:none;border-radius:7px;font-size:13px;font-weight:500;cursor:pointer;white-space:nowrap}
+  .wlist{display:flex;flex-direction:column;gap:6px;margin-bottom:1rem}
+  .witem{display:flex;align-items:center;justify-content:space-between;background:var(--surface2);border-radius:7px;padding:9px 12px}
+  .witem.active{border:1px solid var(--accent)}
+  .witem-name{font-size:13px;cursor:pointer;flex:1}
+  .witem-name.sel{color:var(--accent);font-weight:500}
+  .wdel{background:none;border:none;color:#555;cursor:pointer;font-size:13px;padding:0 4px}
+  .wdel:hover{color:var(--danger)}
+  .wclose{width:100%;padding:11px;background:var(--surface2);color:var(--muted);border:none;border-radius:8px;font-size:14px;cursor:pointer;font-family:var(--font)}
   /* 작업자 설정 */
   #worker-bar{display:flex;align-items:center;gap:8px;padding:7px 12px;background:var(--surface);border-bottom:1px solid var(--border)}
   #worker-bar label{font-size:12px;color:var(--muted);white-space:nowrap}
@@ -145,13 +163,11 @@
   </header>
 
   <div id="worker-bar">
-    <label>작업자</label>
-    <select id="worker-select">
+    <label id="worker-label">작업자</label>
+    <select id="worker-select" style="flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:5px 8px;color:var(--text);font-size:13px;font-family:var(--font);outline:none">
       <option value="">-- 선택 --</option>
-      <option value="__new__">+ 직접 입력</option>
     </select>
-    <input type="text" id="worker-input" placeholder="이름 입력 후 저장">
-    <button id="worker-save">설정</button>
+    <button id="worker-manage" style="padding:5px 10px;background:var(--surface2);color:var(--muted);border:1px solid var(--border);border-radius:6px;font-size:12px;cursor:pointer;white-space:nowrap;font-family:var(--font)">관리</button>
   </div>
   <div id="rp-backdrop"></div>
   <div id="rp">
@@ -193,6 +209,18 @@
   <div id="tw"><div style="padding:2.5rem 0;text-align:center;color:var(--muted);font-size:13px;line-height:2">아직 스캔된 항목이 없습니다</div></div>
 </div>
 
+<!-- 작업자 관리 모달 -->
+<div id="wm">
+  <div class="wbox">
+    <h3>작업자 관리</h3>
+    <div class="wadd-row">
+      <input type="text" id="w-input" placeholder="작업자 이름 입력">
+      <button id="w-add">추가</button>
+    </div>
+    <div class="wlist" id="wlist"></div>
+    <button class="wclose" id="w-close">닫기</button>
+  </div>
+</div>
 <!-- 수정 모달 -->
 <div id="em">
   <div class="ebox">
