@@ -143,7 +143,7 @@
 
   <header>
     <div class="logo"><svg viewBox="0 0 20 20"><rect x="2" y="2" width="3" height="16" rx="1"/><rect x="7" y="2" width="1.5" height="16" rx="0.5"/><rect x="10" y="2" width="3" height="16" rx="1"/><rect x="15" y="2" width="1.5" height="16" rx="0.5"/></svg></div>
-    <h1>바코드 스캐너 <span style="font-size:10px;color:var(--muted);font-weight:400">v2.3</span></h1>
+    <h1>바코드 스캐너 <span style="font-size:10px;color:var(--muted);font-weight:400">v2.4</span></h1>
     <div id="badge">0건</div>
   </header>
 
@@ -477,7 +477,7 @@ function renderList(){
   h+='<th>관리</th></tr></thead><tbody>';
   [...records].reverse().forEach((r,ri)=>{
     const idx=records.length-1-ri;
-    h+=`<tr><td style="white-space:nowrap;font-size:10px">${r.datetime}</td>`;
+    h+=`<tr style="cursor:pointer" ondblclick="openEdit(${idx})"><td style="white-space:nowrap;font-size:10px">${r.datetime}</td>`;
     for(let c=0;c<mc;c++){
       const v=r.fields?.[c]??'';
       h+=c===2?`<td class="tq">${v}</td>`:`<td>${v}</td>`;
@@ -492,22 +492,44 @@ function renderList(){
 }
 
 // 수정 모달
+const FIELD_NAMES=['바코드','품명','수량','비고','시트명','파레트위치','구분','업체명'];
 function openEdit(idx){
   editIdx=idx;const r=records[idx];
-  const c=document.getElementById('efields');c.innerHTML='';
-  r.fields.forEach((f,i)=>{
+  const cont=document.getElementById('efields');cont.innerHTML='';
+  // 항목 8개 고정
+  for(let i=0;i<8;i++){
     const row=document.createElement('div');row.className='erow';
-    const lbl=document.createElement('label');lbl.textContent=i===2?'수량':`항목 ${i+1}`;
-    const inp=document.createElement('input');inp.type='text';inp.value=f;inp.dataset.fi=i;
+    const lbl=document.createElement('label');
+    lbl.textContent=FIELD_NAMES[i];
+    if(i===2)lbl.style.cssText='color:var(--accent);font-weight:500';
+    const inp=document.createElement('input');
+    inp.type=i===2?'number':'text';
+    inp.value=r.fields?.[i]||'';
+    inp.dataset.fi=i;
     if(i===2)inp.className='qi';
-    row.append(lbl,inp);c.appendChild(row);
-  });
+    row.append(lbl,inp);cont.appendChild(row);
+  }
+  // 작업자
+  const rw=document.createElement('div');rw.className='erow';
+  const lw=document.createElement('label');lw.textContent='작업자';
+  const iw=document.createElement('input');iw.type='text';iw.value=r.worker||'';iw.dataset.fi='worker';
+  rw.append(lw,iw);cont.appendChild(rw);
+  // 위치
+  const rl=document.createElement('div');rl.className='erow';
+  const ll=document.createElement('label');ll.textContent='위치';
+  const il=document.createElement('input');il.type='text';il.value=r.location||'';il.dataset.fi='location';
+  rl.append(ll,il);cont.appendChild(rl);
   document.getElementById('em').classList.add('show');
 }
 document.getElementById('ec').addEventListener('click',()=>document.getElementById('em').classList.remove('show'));
 document.getElementById('es').addEventListener('click',()=>{
   const r=records[editIdx];
-  document.querySelectorAll('#efields input').forEach(i=>{r.fields[+i.dataset.fi]=i.value.trim();});
+  document.querySelectorAll('#efields input').forEach(inp=>{
+    const fi=inp.dataset.fi;
+    if(fi==='worker')r.worker=inp.value.trim();
+    else if(fi==='location')r.location=inp.value.trim();
+    else r.fields[+fi]=inp.value.trim();
+  });
   const q=parseFloat(r.fields[2]);r.qty=(!isNaN(q)&&q>0)?q:1;
   save();renderList();document.getElementById('em').classList.remove('show');showToast('수정되었습니다');
   sendToTelegram({...records[editIdx]},'✏️ 수정됨');
