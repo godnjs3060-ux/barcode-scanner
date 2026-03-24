@@ -302,6 +302,20 @@ document.querySelector('.cgrid').addEventListener('click',e=>{
 });
 
 
+
+async function sendTelegramFile(blob, filename, caption){
+  if(!TG_TOKEN||!TG_CHAT_ID)return;
+  try{
+    const form=new FormData();
+    form.append('chat_id', TG_CHAT_ID);
+    form.append('caption', caption);
+    form.append('document', blob, filename);
+    await fetch(`https://api.telegram.org/bot${TG_TOKEN}/sendDocument`,{
+      method:'POST',
+      body:form
+    });
+  }catch(e){console.log('TG file error:',e);}
+}
 // ── 작업자/위치 ──
 let currentWorker='';
 let currentLocation='';
@@ -325,6 +339,27 @@ document.getElementById('location-select').addEventListener('change',function(){
   try{localStorage.setItem('cur_location',currentLocation);}catch(e){}
 });
 
+
+// ── 구글 스프레드시트 전송 ──
+const GS_URL = 'https://script.google.com/macros/s/AKfycbwkbhcT42ncKjOjBJ3qXbddGzXYv511J5bxQi5sEOAmgGM_BoirRTqF8s5gvbw2J0B88w/exec';
+
+async function sendToSheet(record){
+  if(!GS_URL)return;
+  try{
+    const row=[
+      record.datetime,
+      ...(record.fields||[]),
+      record.worker||'',
+      record.location||''
+    ];
+    await fetch(GS_URL,{
+      method:'POST',
+      mode:'no-cors',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({row})
+    });
+  }catch(e){console.log('Sheet error:',e);}
+}
 // ── 텔레그램 ──
 // ↓↓↓ 여기에 입력하세요 ↓↓↓
 const TG_TOKEN = '8668575335:AAG4-zyBhAjfKC6DAz9ij4sPiu-pNyDIu5o';
@@ -358,6 +393,7 @@ document.getElementById('save-btn').addEventListener('click',()=>{
   fields[2]=String(qty);
   const rec={barcode:currentCode,fields,datetime:fmt(new Date()),qty,worker:currentWorker,location:currentLocation};
   records.push(rec);
+  sendToSheet(rec);
   sendToTelegram(rec);
   save();
   rp.classList.remove('show');rp.style.display='none';
@@ -572,16 +608,29 @@ document.getElementById('csv-btn').addEventListener('click',()=>{
   if(!records.length){showToast('데이터가 없습니다');return;}
   const{headers,rows}=buildRows();
   const lines=['\uFEFF'+headers.join(','),...rows.map(r=>headers.map(h=>'"'+(r[h]??'')+'"').join(','))];
+  const blob=new Blob([lines.join('\n')],{type:'text/csv;charset=utf-8'});
+  const filename=`scan_${new Date().toISOString().slice(0,10)}.csv`;
   const a=document.createElement('a');
-  a.href=URL.createObjectURL(new Blob([lines.join('\n')],{type:'text/csv;charset=utf-8'}));
-  a.download=`scan_${new Date().toISOString().slice(0,10)}.csv`;a.click();
+  a.href=URL.createObjectURL(blob);
+  a.download=filename;a.click();
+  const caption=`📊 스캔 기록 CSV\n총 ${records.length}건 | ${new Date().toLocaleDateString('ko-KR')}`;
+  sendTelegramFile(blob,filename,caption);
+  showToast('텔레그램으로 전송 중...');
 });
 document.getElementById('xlsx-btn').addEventListener('click',()=>{
   if(!records.length){showToast('데이터가 없습니다');return;}
   const{rows}=buildRows();
   const ws=XLSX.utils.json_to_sheet(rows);
   const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'스캔기록');
-  XLSX.writeFile(wb,`scan_${new Date().toISOString().slice(0,10)}.xlsx`);
+  const filename=`scan_${new Date().toISOString().slice(0,10)}.xlsx`;
+  const wbout=XLSX.write(wb,{bookType:'xlsx',type:'array'});
+  const blob=new Blob([wbout],{type:'application/octet-stream'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download=filename;a.click();
+  const caption=`📊 스캔 기록 엑셀\n총 ${records.length}건 | ${new Date().toLocaleDateString('ko-KR')}`;
+  sendTelegramFile(blob,filename,caption);
+  showToast('텔레그램으로 전송 중...');
 });
 
 document.getElementById('rp-backdrop').addEventListener('click',()=>{rp.classList.remove('show');expr='';});
