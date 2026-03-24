@@ -43,6 +43,13 @@
   h1{font-size:14px;font-weight:500}
   #badge{margin-left:auto;font-size:11px;color:var(--accent);background:var(--accent-dim);padding:2px 9px;border-radius:20px}
 
+
+  /* 작업자/위치 바 */
+  #worker-bar{display:flex;align-items:center;gap:6px;padding:6px 10px;background:var(--surface);border-bottom:1px solid var(--border)}
+  #worker-bar label{font-size:11px;color:var(--muted);white-space:nowrap}
+  #worker-bar select{flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:5px 6px;color:var(--text);font-size:12px;font-family:var(--font);outline:none;min-width:0}
+  #worker-bar select:focus{border-color:var(--accent)}
+  .wbar-div{width:1px;height:24px;background:var(--border);flex-shrink:0}
   /* 수량 패널 */
   #rp-backdrop{display:none}
   #rp{display:none;position:fixed;bottom:0;left:0;right:0;background:var(--surface);border-top:2px solid var(--accent);border-radius:16px 16px 0 0;z-index:50;overflow:hidden;padding-bottom:env(safe-area-inset-bottom,8px)}
@@ -110,45 +117,6 @@
   .enc{background:var(--surface2);color:var(--muted)}
   .eok{background:var(--accent);color:#000}
 
-
-
-  /* 작업자 설정 모달 */
-  #wm{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:200;align-items:flex-end;justify-content:center}
-  .wbox{background:var(--surface);border-radius:16px 16px 0 0;padding:1.2rem;width:100%;max-width:480px;max-height:70vh;overflow-y:auto}
-  .wbox h3{font-size:14px;font-weight:500;margin-bottom:1rem}
-  .wadd-row{display:flex;gap:6px;margin-bottom:12px}
-  .wadd-row input{flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:7px;padding:8px 10px;color:var(--text);font-size:13px;outline:none;font-family:var(--font)}
-  .wadd-row input:focus{border-color:var(--accent)}
-  .wadd-row button{padding:8px 14px;background:var(--accent);color:#000;border:none;border-radius:7px;font-size:13px;font-weight:500;cursor:pointer;white-space:nowrap}
-  .wlist{display:flex;flex-direction:column;gap:6px;margin-bottom:1rem}
-  .witem{display:flex;align-items:center;justify-content:space-between;background:var(--surface2);border-radius:7px;padding:9px 12px}
-  .witem.active{border:1px solid var(--accent)}
-  .witem-name{font-size:13px;cursor:pointer;flex:1}
-  .witem-name.sel{color:var(--accent);font-weight:500}
-  .wdel{background:none;border:none;color:#555;cursor:pointer;font-size:13px;padding:0 4px}
-  .wdel:hover{color:var(--danger)}
-  .wclose{width:100%;padding:11px;background:var(--surface2);color:var(--muted);border:none;border-radius:8px;font-size:14px;cursor:pointer;font-family:var(--font)}
-  /* 작업자 설정 */
-  #worker-bar{display:flex;align-items:center;gap:8px;padding:7px 12px;background:var(--surface);border-bottom:1px solid var(--border)}
-  #worker-bar label{font-size:12px;color:var(--muted);white-space:nowrap}
-  #worker-select{flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:5px 8px;color:var(--text);font-size:13px;font-family:var(--font);outline:none}
-  #worker-select:focus{border-color:var(--accent)}
-  #worker-input{display:none;flex:1;background:var(--surface2);border:1px solid var(--accent);border-radius:6px;padding:5px 8px;color:var(--text);font-size:13px;font-family:var(--font);outline:none}
-  #worker-save{padding:5px 12px;background:var(--accent);color:#000;border:none;border-radius:6px;font-size:12px;font-weight:500;cursor:pointer;white-space:nowrap;font-family:var(--font)}
-
-  /* 설정 모달 */
-  #sm{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:200;align-items:flex-end;justify-content:center}
-  #sm.show{display:flex}
-  .sbox{background:var(--surface);border-radius:16px 16px 0 0;padding:1.2rem;width:100%;max-width:480px;max-height:80vh;overflow-y:auto}
-  .sbox h3{font-size:14px;font-weight:500;margin-bottom:1rem}
-  .sgroup{margin-bottom:1rem}
-  .sgroup label{display:block;font-size:11px;color:var(--muted);margin-bottom:4px}
-  .sgroup input{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:7px;padding:9px 10px;color:var(--text);font-size:12px;outline:none;font-family:var(--mono)}
-  .sgroup input:focus{border-color:var(--accent)}
-  .sgroup .sdesc{font-size:10px;color:var(--muted);margin-top:3px;line-height:1.5}
-  .ssave{width:100%;padding:11px;background:var(--accent);color:#000;border:none;border-radius:8px;font-size:14px;font-weight:500;cursor:pointer;font-family:var(--font);margin-bottom:8px}
-  .sclose{width:100%;padding:11px;background:var(--surface2);color:var(--muted);border:none;border-radius:8px;font-size:14px;cursor:pointer;font-family:var(--font)}
-  .sdivider{border:none;border-top:1px solid var(--border);margin:1rem 0}
   .toast{position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%) translateY(20px);background:var(--surface2);border:1px solid var(--border);color:var(--text);font-size:13px;padding:10px 20px;border-radius:8px;opacity:0;transition:opacity .25s,transform .25s;pointer-events:none;z-index:999;white-space:nowrap}
   .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 </style>
@@ -173,34 +141,29 @@
     <div class="logo"><svg viewBox="0 0 20 20"><rect x="2" y="2" width="3" height="16" rx="1"/><rect x="7" y="2" width="1.5" height="16" rx="0.5"/><rect x="10" y="2" width="3" height="16" rx="1"/><rect x="15" y="2" width="1.5" height="16" rx="0.5"/></svg></div>
     <h1>바코드 스캐너</h1>
     <div id="badge">0건</div>
-    <button id="settings-btn" style="background:none;border:none;color:var(--muted);font-size:18px;cursor:pointer;padding:0 4px">⚙️</button>
   </header>
 
-  <div id="worker-bar" style="display:flex;align-items:center;gap:6px;padding:6px 10px;background:var(--surface);border-bottom:1px solid var(--border)">
-    <div style="display:flex;align-items:center;gap:4px;flex:1">
-      <label style="font-size:11px;color:var(--muted);white-space:nowrap">👤</label>
-      <select id="worker-select" style="flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:5px 6px;color:var(--text);font-size:12px;font-family:var(--font);outline:none;min-width:0">
-        <option value="">작업자 선택</option>
-        <option>정해원</option>
-        <option>온한섭</option>
-        <option>조민호</option>
-        <option>정해석</option>
-        <option>작업자1</option>
-        <option>작업자2</option>
-      </select>
-    </div>
-    <div style="width:1px;height:24px;background:var(--border);flex-shrink:0"></div>
-    <div style="display:flex;align-items:center;gap:4px;flex:1">
-      <label style="font-size:11px;color:var(--muted);white-space:nowrap">📍</label>
-      <select id="location-select" style="flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:5px 6px;color:var(--text);font-size:12px;font-family:var(--font);outline:none;min-width:0">
-        <option value="">위치 선택</option>
-        <option>매장</option>
-        <option>1번냉동</option>
-        <option>2번냉동</option>
-        <option>3번냉동</option>
-        <option>4번냉동</option>
-      </select>
-    </div>
+  <div id="worker-bar">
+    <label>👤</label>
+    <select id="worker-select">
+      <option value="">작업자 선택</option>
+      <option>정해원</option>
+      <option>온한섭</option>
+      <option>조민호</option>
+      <option>정해석</option>
+      <option>작업자1</option>
+      <option>작업자2</option>
+    </select>
+    <div class="wbar-div"></div>
+    <label>📍</label>
+    <select id="location-select">
+      <option value="">위치 선택</option>
+      <option>매장</option>
+      <option>1번냉동</option>
+      <option>2번냉동</option>
+      <option>3번냉동</option>
+      <option>4번냉동</option>
+    </select>
   </div>
   <div id="rp-backdrop"></div>
   <div id="rp">
@@ -242,35 +205,6 @@
   <div id="tw"><div style="padding:2.5rem 0;text-align:center;color:var(--muted);font-size:13px;line-height:2">아직 스캔된 항목이 없습니다</div></div>
 </div>
 
-
-<!-- 설정 모달 -->
-<div id="sm">
-  <div class="sbox">
-    <h3>⚙️ 설정</h3>
-
-    <div class="sgroup">
-      <label>텔레그램 Bot Token</label>
-      <input type="text" id="s-tg-token" placeholder="123456789:ABCdef...">
-      <div class="sdesc">@BotFather → /mybots → API Token</div>
-    </div>
-    <div class="sgroup">
-      <label>텔레그램 Chat ID</label>
-      <input type="text" id="s-tg-chatid" placeholder="-100123456789">
-      <div class="sdesc">봇에게 메시지 보낸 후 api.telegram.org/bot[토큰]/getUpdates 에서 확인</div>
-    </div>
-
-    <hr class="sdivider">
-
-    <div class="sgroup">
-      <label>구글 스프레드시트 웹앱 URL</label>
-      <input type="text" id="s-gs-url" placeholder="https://script.google.com/macros/s/...">
-      <div class="sdesc">Apps Script 배포 후 받은 웹앱 URL</div>
-    </div>
-
-    <button class="ssave" id="s-save">저장</button>
-    <button class="sclose" id="s-close">닫기</button>
-  </div>
-</div>
 <!-- 수정 모달 -->
 <div id="em">
   <div class="ebox">
@@ -367,6 +301,54 @@ document.querySelector('.cgrid').addEventListener('click',e=>{
   }
 });
 
+
+// ── 작업자/위치 ──
+let currentWorker='';
+let currentLocation='';
+
+function loadSelections(){
+  try{
+    currentWorker=localStorage.getItem('cur_worker')||'';
+    currentLocation=localStorage.getItem('cur_location')||'';
+    const ws=document.getElementById('worker-select');
+    const ls=document.getElementById('location-select');
+    [...ws.options].forEach(o=>{if(o.value===currentWorker)o.selected=true;});
+    [...ls.options].forEach(o=>{if(o.value===currentLocation)o.selected=true;});
+  }catch(e){}
+}
+document.getElementById('worker-select').addEventListener('change',function(){
+  currentWorker=this.value;
+  try{localStorage.setItem('cur_worker',currentWorker);}catch(e){}
+});
+document.getElementById('location-select').addEventListener('change',function(){
+  currentLocation=this.value;
+  try{localStorage.setItem('cur_location',currentLocation);}catch(e){}
+});
+
+// ── 텔레그램 ──
+// ↓↓↓ 여기에 입력하세요 ↓↓↓
+const TG_TOKEN = '';  // 예: '123456789:ABCdef...'
+const TG_CHAT_ID = ''; // 예: '-100123456789'
+// ↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑
+
+async function sendToTelegram(record){
+  if(!TG_TOKEN||!TG_CHAT_ID)return;
+  try{
+    const f=record.fields||[];
+    const lines=[
+      '📦 바코드 스캔',
+      ...f.map((v,i)=>v?`${i===2?'수량':('항목'+(i+1))}: ${v}`:'').filter(Boolean),
+      record.worker?`👤 작업자: ${record.worker}`:'',
+      record.location?`📍 위치: ${record.location}`:'',
+      `🕐 ${record.datetime}`
+    ].filter(Boolean).join('\n');
+    await fetch(`https://api.telegram.org/bot${TG_TOKEN}/sendMessage`,{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({chat_id:TG_CHAT_ID,text:lines})
+    });
+  }catch(e){console.log('TG error:',e);}
+}
 document.getElementById('save-btn').addEventListener('click',()=>{
   if(!currentCode){showToast('스캔된 바코드가 없습니다');return;}
   const qty=finalQty();
@@ -374,12 +356,10 @@ document.getElementById('save-btn').addEventListener('click',()=>{
   const fields=split(currentCode);
   while(fields.length<3)fields.push('');
   fields[2]=String(qty);
-  if(currentWorker)fields.push(currentWorker);
-  const newRecord={barcode:currentCode,fields,datetime:fmt(new Date()),qty,worker:currentWorker,location:currentLocation};
-  records.push(newRecord);
+  const rec={barcode:currentCode,fields,datetime:fmt(new Date()),qty,worker:currentWorker,location:currentLocation};
+  records.push(rec);
+  sendToTelegram(rec);
   save();
-  sendToSheet(newRecord);
-  sendToTelegram(newRecord);
   rp.classList.remove('show');rp.style.display='none';
   currentCode='';lastCode='';lastTime=0;lastResults=[];
   expr='';
@@ -492,9 +472,19 @@ async function startCam(){
   if(!ok)return;
   try{
     stream=await navigator.mediaDevices.getUserMedia({
-      video:{facingMode:'environment',width:{ideal:1280},height:{ideal:720}},
+      video:{
+        facingMode:'environment',
+        width:{ideal:1280},
+        height:{ideal:720},
+        exposureMode:'continuous',
+        whiteBalanceMode:'continuous',
+        focusMode:'continuous'
+      },
       audio:false
     });
+    // 밝기 자동 조정
+    const track=stream.getVideoTracks()[0];
+    try{await track.applyConstraints({advanced:[{exposureMode:'continuous',whiteBalanceMode:'continuous',focusMode:'continuous'}]});}catch(e){}
     vid.srcObject=stream;
     await vid.play();
     scanning=true;
@@ -568,10 +558,12 @@ document.getElementById('cok').addEventListener('click',()=>{
 // 내보내기
 function buildRows(){
   const mc=maxCols();
-  const headers=['날짜/시간',...Array.from({length:mc},(_,i)=>i===2?'수량':`항목${i+1}`)];
+  const headers=['날짜/시간',...Array.from({length:mc},(_,i)=>i===2?'수량':`항목${i+1}`),'작업자','위치'];
   const rows=records.map(r=>{
     const row={'날짜/시간':r.datetime};
     for(let i=0;i<mc;i++)row[i===2?'수량':`항목${i+1}`]=r.fields?.[i]??'';
+    row['작업자']=r.worker||'';
+    row['위치']=r.location||'';
     return row;
   });
   return{headers,rows};
@@ -594,198 +586,7 @@ document.getElementById('xlsx-btn').addEventListener('click',()=>{
 
 document.getElementById('rp-backdrop').addEventListener('click',()=>{rp.classList.remove('show');expr='';});
 load();renderList();
-loadSettings();
-
-
-// ── 설정 ──
-const SETTINGS_KEY='barcode_settings';
-// ↓↓↓ 여기에 직접 입력하세요 (한번만 설정하면 됨) ↓↓↓
-const DEFAULT_SETTINGS={
-  tgToken:'',      // 텔레그램 Bot Token 예: '123456:ABCdef'
-  tgChatId:'',     // 텔레그램 Chat ID 예: '-100123456'
-  gsUrl:'https://script.google.com/macros/s/AKfycbwkbhcT42ncKjOjBJ3qXbddGzXYv511J5bxQi5sEOAmgGM_BoirRTqF8s5gvbw2J0B88w/exec'
-};
-// ↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑
-let settings=Object.assign({},DEFAULT_SETTINGS);
-
-function loadSettings(){
-  try{const s=localStorage.getItem(SETTINGS_KEY);if(s)settings=Object.assign({},DEFAULT_SETTINGS,JSON.parse(s));else settings=Object.assign({},DEFAULT_SETTINGS);}catch(e){settings=Object.assign({},DEFAULT_SETTINGS);}
-}
-function saveSettings(){
-  try{localStorage.setItem(SETTINGS_KEY,JSON.stringify(settings));}catch(e){}
-}
-function renderSettingsForm(){
-  document.getElementById('s-tg-token').value=settings.tgToken||'';
-  document.getElementById('s-tg-chatid').value=settings.tgChatId||'';
-  document.getElementById('s-gs-url').value=settings.gsUrl||'';
-}
-
-document.getElementById('settings-btn').addEventListener('click',()=>{
-  renderSettingsForm();
-  document.getElementById('sm').style.display='flex';
-});
-document.getElementById('s-close').addEventListener('click',()=>document.getElementById('sm').style.display='none');
-document.getElementById('s-save').addEventListener('click',()=>{
-  settings.tgToken=document.getElementById('s-tg-token').value.trim();
-  settings.tgChatId=document.getElementById('s-tg-chatid').value.trim();
-  settings.gsUrl=document.getElementById('s-gs-url').value.trim();
-  saveSettings();
-  document.getElementById('sm').classList.remove('show');
-  showToast('설정이 저장되었습니다');
-});
-
-// 구글 스프레드시트로 전송
-async function sendToSheet(record){
-  if(!settings.gsUrl)return;
-  try{
-    const row=[
-      record.datetime,
-      ...record.fields,
-      record.worker||'',
-      record.location||''
-    ];
-    await fetch(settings.gsUrl,{
-      method:'POST',
-      mode:'no-cors',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({row})
-    });
-  }catch(e){console.log('Sheet error:',e);}
-}
-
-// 텔레그램으로 전송
-async function sendToTelegram(record){
-  if(!settings.tgToken||!settings.tgChatId)return;
-  try{
-    const fields=record.fields.map((f,i)=>f?`${i+1}. ${f}`:'').filter(Boolean).join('\n');
-    const msg=`📦 바코드 스캔\n${fields}\n작업자: ${record.worker||'-'}\n위치: ${record.location||'-'}\n시간: ${record.datetime}`;
-    await fetch(`https://api.telegram.org/bot${settings.tgToken}/sendMessage`,{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({chat_id:settings.tgChatId,text:msg})
-    });
-  }catch(e){console.log('Telegram error:',e);}
-}
-
-
-// ── 작업자/위치 ──
-let currentWorker='';
-let currentLocation='';
-
-function loadSelections(){
-  try{
-    currentWorker=localStorage.getItem('cur_worker')||'';
-    currentLocation=localStorage.getItem('cur_location')||'';
-    const ws=document.getElementById('worker-select');
-    const ls=document.getElementById('location-select');
-    if(currentWorker)[...ws.options].forEach(o=>{if(o.value===currentWorker)o.selected=true;});
-    if(currentLocation)[...ls.options].forEach(o=>{if(o.value===currentLocation)o.selected=true;});
-  }catch(e){}
-}
-function saveSelections(){
-  try{
-    localStorage.setItem('cur_worker',currentWorker);
-    localStorage.setItem('cur_location',currentLocation);
-  }catch(e){}
-}
-document.getElementById('worker-select').addEventListener('change',function(){
-  currentWorker=this.value;saveSelections();
-});
-document.getElementById('location-select').addEventListener('change',function(){
-  currentLocation=this.value;saveSelections();
-});
 loadSelections();
-});
-
-loadSelections();
-
-const WORKER_KEY='barcode_workers';
-const WORKER_CUR='barcode_current_worker';
-let currentWorker='';
-let workerList=[];
-
-function loadWorkers(){
-  try{
-    const w=localStorage.getItem(WORKER_KEY);
-    if(w)workerList=JSON.parse(w);
-    currentWorker=localStorage.getItem(WORKER_CUR)||'';
-  }catch(e){}
-}
-function saveWorkers(){
-  try{
-    localStorage.setItem(WORKER_KEY,JSON.stringify(workerList));
-    localStorage.setItem(WORKER_CUR,currentWorker);
-  }catch(e){}
-}
-function renderWorkerSelect(){
-  const sel=document.getElementById('worker-select');
-  sel.innerHTML='<option value="">-- 선택 --</option>';
-  workerList.forEach(w=>{
-    const opt=document.createElement('option');
-    opt.value=w;opt.textContent=w;
-    if(w===currentWorker)opt.selected=true;
-    sel.appendChild(opt);
-  });
-  updateWorkerBar();
-}
-function updateWorkerBar(){
-  const lbl=document.getElementById('worker-label');
-  lbl.textContent=currentWorker?('👤 '+currentWorker):'작업자';
-  lbl.style.color=currentWorker?'var(--accent)':'var(--muted)';
-}
-function renderWorkerList(){
-  const list=document.getElementById('wlist');
-  if(!workerList.length){
-    list.innerHTML='<div style="text-align:center;color:var(--muted);font-size:13px;padding:1rem">등록된 작업자가 없습니다</div>';
-    return;
-  }
-  list.innerHTML='';
-  workerList.forEach((w,i)=>{
-    const item=document.createElement('div');
-    item.className='witem'+(w===currentWorker?' active':'');
-    item.innerHTML='<span class="witem-name'+(w===currentWorker?' sel':'')+'" data-name="'+w+'">'+w+(w===currentWorker?' ✓':'')+'</span><button class="wdel" data-i="'+i+'">삭제</button>';
-    list.appendChild(item);
-  });
-  list.querySelectorAll('.witem-name').forEach(el=>el.addEventListener('click',()=>{
-    currentWorker=el.dataset.name;
-    saveWorkers();renderWorkerSelect();renderWorkerList();
-    showToast('작업자: '+currentWorker);
-  }));
-  list.querySelectorAll('.wdel').forEach(btn=>btn.addEventListener('click',()=>{
-    const idx=+btn.dataset.i;
-    if(workerList[idx]===currentWorker)currentWorker='';
-    workerList.splice(idx,1);
-    saveWorkers();renderWorkerSelect();renderWorkerList();
-  }));
-}
-
-document.getElementById('worker-select').addEventListener('change',function(){
-  currentWorker=this.value;
-  saveWorkers();updateWorkerBar();
-});
-document.getElementById('worker-manage').addEventListener('click',()=>{
-  renderWorkerList();
-  document.getElementById('wm').style.display='flex';
-});
-document.getElementById('w-close').addEventListener('click',()=>{
-  document.getElementById('wm').style.display='none';
-});
-document.getElementById('w-add').addEventListener('click',()=>{
-  const inp=document.getElementById('w-input');
-  const name=inp.value.trim();
-  if(!name){showToast('이름을 입력해주세요');return;}
-  if(workerList.includes(name)){showToast('이미 있는 작업자예요');return;}
-  workerList.push(name);
-  if(!currentWorker)currentWorker=name;
-  saveWorkers();renderWorkerSelect();renderWorkerList();
-  inp.value='';
-  showToast(name+' 추가됨');
-});
-document.getElementById('w-input').addEventListener('keydown',e=>{
-  if(e.key==='Enter')document.getElementById('w-add').click();
-});
-
-loadListsFromSheet();
 startCam();
 </script>
 </body>
