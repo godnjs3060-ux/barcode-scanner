@@ -141,7 +141,7 @@
 
   <header>
     <div class="logo"><svg viewBox="0 0 20 20"><rect x="2" y="2" width="3" height="16" rx="1"/><rect x="7" y="2" width="1.5" height="16" rx="0.5"/><rect x="10" y="2" width="3" height="16" rx="1"/><rect x="15" y="2" width="1.5" height="16" rx="0.5"/></svg></div>
-    <h1>바코드 스캐너 <span style="font-size:10px;color:var(--muted);font-weight:400">v1.6</span></h1>
+    <h1>바코드 스캐너 <span style="font-size:10px;color:var(--muted);font-weight:400">v1.5</span></h1>
     <div id="badge">0건</div>
   </header>
 
@@ -568,8 +568,7 @@ async function sendToTelegram(rec,prefix){
       rec.worker?'👤 작업자: '+rec.worker:'',
       rec.location?'📍 위치: '+rec.location:'',
       '🕐 '+rec.datetime
-    ].filter(Boolean).join('
-');
+    ].filter(Boolean).join('\n');
     await fetch('https://api.telegram.org/bot'+TG_TOKEN+'/sendMessage',{
       method:'POST',headers:{'Content-Type':'application/json'},
       body:JSON.stringify({chat_id:TG_CHAT_ID,text:lines})
