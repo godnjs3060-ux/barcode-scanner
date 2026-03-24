@@ -44,6 +44,15 @@
   #badge{margin-left:auto;font-size:11px;color:var(--accent);background:var(--accent-dim);padding:2px 9px;border-radius:20px}
 
 
+
+  /* 불러오기 모달 */
+  #load-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:200;align-items:flex-end;justify-content:center}
+  #load-modal.show{display:flex}
+  .lm-box{background:var(--surface);border-radius:16px 16px 0 0;padding:1.2rem;width:100%;max-width:480px;max-height:70vh;overflow-y:auto}
+  .lm-box h3{font-size:14px;font-weight:500;margin-bottom:1rem}
+  .sheet-item{padding:10px 14px;background:var(--surface2);border-radius:8px;margin-bottom:6px;cursor:pointer;font-size:13px;border:1px solid var(--border)}
+  .sheet-item:hover{border-color:var(--accent);color:var(--accent)}
+  .lm-close{width:100%;padding:11px;background:var(--surface2);color:var(--muted);border:none;border-radius:8px;font-size:14px;cursor:pointer;font-family:var(--font);margin-top:8px}
   /* 작업자/위치 바 */
   #worker-bar{display:flex;align-items:center;gap:6px;padding:6px 10px;background:var(--surface);border-bottom:1px solid var(--border)}
   #worker-bar label{font-size:11px;color:var(--muted);white-space:nowrap}
@@ -198,6 +207,7 @@
     <span>스캔 기록</span>
     <div class="lbtns">
       <button class="xb e" id="csv-btn">CSV</button>
+      <label class="xb e" id="import-btn" style="cursor:pointer">불러오기<input type="file" id="import-file" accept=".xlsx,.csv" style="display:none"></label>
       <button class="xb e" id="xlsx-btn">엑셀</button>
       <button class="xb r" id="reset-btn">초기화</button>
     </div>
@@ -572,9 +582,30 @@ function openEdit(idx){
 document.getElementById('ec').addEventListener('click',()=>document.getElementById('em').classList.remove('show'));
 document.getElementById('es').addEventListener('click',()=>{
   const r=records[editIdx];
+  // 수정 전 수량 기억
+  const prevQty=r.fields[2]||'';
   document.querySelectorAll('#efields input').forEach(i=>{r.fields[+i.dataset.fi]=i.value.trim();});
   const q=parseFloat(r.fields[2]);r.qty=(!isNaN(q)&&q>0)?q:1;
   save();renderList();document.getElementById('em').classList.remove('show');showToast('수정되었습니다');
+  // 텔레그램 수정 알림
+  if(TG_TOKEN&&TG_CHAT_ID){
+    const f=r.fields||[];
+    const lines=[
+      '✏️ 수정됨',
+      f[0]?`항목1: ${f[0]}`:'',
+      f[1]?`항목2: ${f[1]}`:'',
+      prevQty!==r.fields[2]?`수량: ${prevQty} → ${r.fields[2]}`:(r.fields[2]?`수량: ${r.fields[2]}`:''),
+      r.worker?`👤 작업자: ${r.worker}`:'',
+      r.location?`📍 위치: ${r.location}`:'',
+      `🕐 ${r.datetime}`,
+      `수정시간: ${fmt(new Date())}`
+    ].filter(Boolean).join('\n');
+    fetch(`https://api.telegram.org/bot${TG_TOKEN}/sendMessage`,{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({chat_id:TG_CHAT_ID,text:lines})
+    }).catch(e=>console.log('TG error:',e));
+  }
 });
 
 // 삭제
@@ -633,7 +664,113 @@ document.getElementById('xlsx-btn').addEventListener('click',()=>{
   showToast('텔레그램으로 전송 중...');
 });
 
+
+// ── 엑셀/CSV 불러오기 ──
+document.getElementById('import-file').addEventListener('change',function(e){
+  const file=e.target.files[0];
+  if(!file)return;
+  const reader=new FileReader();
+  reader.onload=function(ev){
+    try{
+      const data=new Uint8Array(ev.target.result);
+      const wb=XLSX.read(data,{type:'array'});
+      const ws=wb.Sheets[wb.SheetNames[0]];
+      const rows=XLSX.utils.sheet_to_json(ws,{header:1,defval:''});
+      if(rows.length<2){showToast('데이터가 없습니다');return;}
+      const headers=rows[0];
+      const imported=[];
+      for(let i=1;i<rows.length;i++){
+        const row=rows[i];
+        if(!row.some(v=>v))continue;
+        const datetime=String(row[0]||'');
+        const worker=String(row[headers.indexOf('작업자')]||'');
+        const location=String(row[headers.indexOf('위치')]||'');
+        // 항목 열 추출
+        const fields=[];
+        headers.forEach((h,hi)=>{
+          if(h==='날짜/시간'||h==='작업자'||h==='위치')return;
+          fields.push(String(row[hi]||''));
+        });
+        const qty=parseFloat(fields[2])||1;
+        imported.push({barcode:fields.join('/'),fields,datetime,qty,worker,location});
+      }
+      if(!imported.length){showToast('불러올 데이터가 없습니다');return;}
+      records=[...records,...imported];
+      save();renderList();
+      showToast(imported.length+'건 불러왔습니다');
+    }catch(err){
+      showToast('파일 읽기 실패: '+err.message);
+    }
+  };
+  reader.readAsArrayBuffer(file);
+  this.value='';
+});
 document.getElementById('rp-backdrop').addEventListener('click',()=>{rp.classList.remove('show');expr='';});
+
+// ── 스프레드시트에서 불러오기 ──
+document.getElementById('load-btn').addEventListener('click',async()=>{
+  document.getElementById('load-modal').style.display='flex';
+  const list=document.getElementById('sheet-list');
+  list.innerHTML='<div style="text-align:center;color:var(--muted);padding:1rem;font-size:13px">불러오는 중...</div>';
+  try{
+    const res=await fetch(GS_URL+'?action=getSheets');
+    const data=await res.json();
+    if(!data.sheets||!data.sheets.length){
+      list.innerHTML='<div style="text-align:center;color:var(--muted);padding:1rem;font-size:13px">저장된 날짜가 없습니다</div>';
+      return;
+    }
+    list.innerHTML='';
+    data.sheets.forEach(s=>{
+      const div=document.createElement('div');
+      div.className='sheet-item';
+      div.textContent=s;
+      div.addEventListener('click',async()=>{
+        div.textContent=s+' 불러오는 중...';
+        try{
+          const r=await fetch(GS_URL+'?action=getData&sheet='+encodeURIComponent(s));
+          const d=await r.json();
+          if(d.rows&&d.rows.length){
+            // 기존 records에 추가 (중복 날짜/시간 제외)
+            const existing=new Set(records.map(r=>r.datetime));
+            let added=0;
+            d.rows.forEach(row=>{
+              const dt=row['날짜/시간']||'';
+              if(existing.has(dt))return;
+              // fields 재구성
+              const fields=[];
+              for(let i=1;i<=8;i++){
+                const key=i===3?'수량':`항목${i}`;
+                fields.push(row[key]||'');
+              }
+              records.push({
+                barcode:fields.join('/'),
+                fields,
+                datetime:dt,
+                qty:parseFloat(fields[2])||1,
+                worker:row['작업자']||'',
+                location:row['위치']||''
+              });
+              added++;
+            });
+            save();renderList();
+            document.getElementById('load-modal').style.display='none';
+            showToast(s+' '+added+'건 불러옴');
+          }else{
+            div.textContent=s+' (데이터 없음)';
+          }
+        }catch(err){
+          div.textContent=s+' 불러오기 실패';
+        }
+      });
+      list.appendChild(div);
+    });
+  }catch(err){
+    list.innerHTML='<div style="text-align:center;color:var(--danger);padding:1rem;font-size:13px">연결 실패. Apps Script 배포를 확인해주세요.</div>';
+  }
+});
+document.getElementById('lm-close').addEventListener('click',()=>{
+  document.getElementById('load-modal').style.display='none';
+});
 load();renderList();
 loadSelections();
 startCam();
