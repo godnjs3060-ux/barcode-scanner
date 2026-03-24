@@ -620,25 +620,22 @@ document.getElementById('cam-start-btn').addEventListener('click',()=>{
 
 // 수기입력
 document.getElementById('manual-btn').addEventListener('click',()=>{
-  document.querySelectorAll('#mm input[data-mfi]').forEach(i=>i.value='');
+  ['m-f0','m-f1','m-f2','m-f3','m-f4','m-f5','m-f6','m-f7'].forEach(id=>{
+    document.getElementById(id).value='';
+  });
   document.getElementById('mm').style.display='flex';
+  setTimeout(()=>document.getElementById('m-f0').focus(),100);
 });
 document.getElementById('m-cancel').addEventListener('click',()=>{
   document.getElementById('mm').style.display='none';
 });
 document.getElementById('m-ok').addEventListener('click',()=>{
-  const inputs=document.querySelectorAll('#mm input[data-mfi]');
-  const fields=[...inputs].map(i=>i.value.trim());
-  if(!fields.some(v=>v)){showToast('최소 한 항목을 입력해주세요');return;}
-  const qty=parseFloat(fields[2])||1;
-  fields[2]=String(qty);
-  const rec={barcode:fields.join('/'),fields,datetime:fmt(new Date()),qty,worker:currentWorker,location:currentLocation};
-  records.push(rec);
-  save();renderList();
-  sendToTelegram(rec,'✏️ 수기입력');
-  sendToSheet(rec);
+  const vals=['m-f0','m-f1','m-f2','m-f3','m-f4','m-f5','m-f6','m-f7'].map(id=>document.getElementById(id).value.trim());
+  if(!vals.some(v=>v)){showToast('최소 한 항목을 입력해주세요');return;}
+  // /로 합쳐서 onDetected에 넘김 - 스캔과 동일한 흐름
+  const code=vals.join('/');
   document.getElementById('mm').style.display='none';
-  showToast('저장되었습니다');
+  onDetected(code);
 });
 
 // 불러오기
@@ -675,11 +672,6 @@ load();renderList();
 setTimeout(loadSelections,50);
 </script>
 
-<!-- 수기입력 모달 -->
-<div id="mm" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:200;align-items:flex-end;justify-content:center">
-  <div class="ebox">
-    <h3>✏️ 수기입력</h3>
-    <div class="erow"><label>바코드</label><input type="text" class="" data-mfi="0" placeholder=""></div>
     <div class="erow"><label>품명</label><input type="text" class="" data-mfi="1" placeholder=""></div>
     <div class="erow"><label>수량</label><input type="number" class="qi" data-mfi="2" placeholder=""></div>
     <div class="erow"><label>비고</label><input type="text" class="" data-mfi="3" placeholder=""></div>
@@ -690,6 +682,25 @@ setTimeout(loadSelections,50);
     <div class="eacts">
       <button class="enc" id="m-cancel">취소</button>
       <button class="eok" id="m-ok">저장</button>
+    </div>
+  </div>
+</div>
+
+<!-- 수기입력 모달 -->
+<div id="mm" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:200;align-items:flex-end;justify-content:center">
+  <div class="ebox">
+    <h3>✏️ 수기입력</h3>
+    <div class="erow"><label>바코드</label><input type="text" id="m-f0" placeholder="*GA0014*"></div>
+    <div class="erow"><label>품명</label><input type="text" id="m-f1" placeholder="특딱파"></div>
+    <div class="erow"><label style="color:var(--accent);font-weight:500">수량</label><input type="number" id="m-f2" class="qi" placeholder="8"></div>
+    <div class="erow"><label>비고</label><input type="text" id="m-f3" placeholder="NEW"></div>
+    <div class="erow"><label>시트명</label><input type="text" id="m-f4" placeholder=""></div>
+    <div class="erow"><label>파레트위치</label><input type="text" id="m-f5" placeholder=""></div>
+    <div class="erow"><label>구분</label><input type="text" id="m-f6" placeholder=""></div>
+    <div class="erow"><label>업체명</label><input type="text" id="m-f7" placeholder=""></div>
+    <div class="eacts">
+      <button class="enc" id="m-cancel">취소</button>
+      <button class="eok" id="m-ok">확인</button>
     </div>
   </div>
 </div>
