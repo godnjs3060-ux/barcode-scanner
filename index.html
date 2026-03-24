@@ -181,6 +181,12 @@
       <label style="font-size:11px;color:var(--muted);white-space:nowrap">👤</label>
       <select id="worker-select" style="flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:5px 6px;color:var(--text);font-size:12px;font-family:var(--font);outline:none;min-width:0">
         <option value="">작업자 선택</option>
+        <option>정해원</option>
+        <option>온한섭</option>
+        <option>조민호</option>
+        <option>정해석</option>
+        <option>작업자1</option>
+        <option>작업자2</option>
       </select>
     </div>
     <div style="width:1px;height:24px;background:var(--border);flex-shrink:0"></div>
@@ -188,9 +194,13 @@
       <label style="font-size:11px;color:var(--muted);white-space:nowrap">📍</label>
       <select id="location-select" style="flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:5px 6px;color:var(--text);font-size:12px;font-family:var(--font);outline:none;min-width:0">
         <option value="">위치 선택</option>
+        <option>매장</option>
+        <option>1번냉동</option>
+        <option>2번냉동</option>
+        <option>3번냉동</option>
+        <option>4번냉동</option>
       </select>
     </div>
-    <button id="refresh-btn" style="padding:5px 8px;background:var(--surface2);color:var(--muted);border:1px solid var(--border);border-radius:6px;font-size:13px;cursor:pointer">🔄</button>
   </div>
   <div id="rp-backdrop"></div>
   <div id="rp">
@@ -668,7 +678,7 @@ async function sendToTelegram(record){
 }
 
 
-// ── 작업자/위치 (구글 스프레드시트에서 로드) ──
+// ── 작업자/위치 ──
 let currentWorker='';
 let currentLocation='';
 
@@ -676,6 +686,10 @@ function loadSelections(){
   try{
     currentWorker=localStorage.getItem('cur_worker')||'';
     currentLocation=localStorage.getItem('cur_location')||'';
+    const ws=document.getElementById('worker-select');
+    const ls=document.getElementById('location-select');
+    if(currentWorker)[...ws.options].forEach(o=>{if(o.value===currentWorker)o.selected=true;});
+    if(currentLocation)[...ls.options].forEach(o=>{if(o.value===currentLocation)o.selected=true;});
   }catch(e){}
 }
 function saveSelections(){
@@ -684,45 +698,13 @@ function saveSelections(){
     localStorage.setItem('cur_location',currentLocation);
   }catch(e){}
 }
-
-async function loadListsFromSheet(){
-  if(!settings.gsUrl)return;
-  try{
-    const url=settings.gsUrl+'?action=getLists';
-    const res=await fetch(url,{method:'GET',mode:'cors'});
-    const data=await res.json();
-    if(data.workers){
-      const ws=document.getElementById('worker-select');
-      ws.innerHTML='<option value="">작업자 선택</option>';
-      data.workers.forEach(w=>{
-        const o=document.createElement('option');
-        o.value=w;o.textContent=w;
-        if(w===currentWorker)o.selected=true;
-        ws.appendChild(o);
-      });
-    }
-    if(data.locations){
-      const ls=document.getElementById('location-select');
-      ls.innerHTML='<option value="">위치 선택</option>';
-      data.locations.forEach(l=>{
-        const o=document.createElement('option');
-        o.value=l;o.textContent=l;
-        if(l===currentLocation)o.selected=true;
-        ls.appendChild(o);
-      });
-    }
-  }catch(e){showToast('목록 불러오기 실패');}
-}
-
 document.getElementById('worker-select').addEventListener('change',function(){
   currentWorker=this.value;saveSelections();
 });
 document.getElementById('location-select').addEventListener('change',function(){
   currentLocation=this.value;saveSelections();
 });
-document.getElementById('refresh-btn').addEventListener('click',()=>{
-  showToast('목록 새로고침 중...');
-  loadListsFromSheet();
+loadSelections();
 });
 
 loadSelections();
