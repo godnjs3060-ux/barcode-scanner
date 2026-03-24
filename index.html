@@ -143,7 +143,7 @@
 
   <header>
     <div class="logo"><svg viewBox="0 0 20 20"><rect x="2" y="2" width="3" height="16" rx="1"/><rect x="7" y="2" width="1.5" height="16" rx="0.5"/><rect x="10" y="2" width="3" height="16" rx="1"/><rect x="15" y="2" width="1.5" height="16" rx="0.5"/></svg></div>
-    <h1>바코드 스캐너 <span style="font-size:10px;color:var(--muted);font-weight:400">v2.5</span></h1>
+    <h1>바코드 스캐너 <span style="font-size:10px;color:var(--muted);font-weight:400">v2.7</span></h1>
     <div id="badge">0건</div>
   </header>
 
@@ -306,7 +306,7 @@ document.querySelector('.cgrid').addEventListener('click',e=>{
   const a=b.dataset.a,v=b.dataset.v;
   if(a==='C'){expr='';updCalc();}
   else if(a==='back'){expr=expr.slice(0,-1);updCalc();}
-  else if(a==='cancel'){rp.classList.remove('show');expr='';}
+  else if(a==='cancel'){rp.classList.remove('show');rp.style.display='none';expr='';}
   else if(v!==undefined){
     const ops=['+','-','*','/','%'];
     if(ops.includes(v)&&ops.includes(expr.slice(-1)))expr=expr.slice(0,-1);
@@ -539,9 +539,14 @@ document.getElementById('es').addEventListener('click',()=>{
 document.getElementById('dc').addEventListener('click',()=>document.getElementById('dm').classList.remove('show'));
 document.getElementById('dok').addEventListener('click',()=>{
   if(delIdx>=0){
-    const deleted=records[delIdx];
+    const deleted={
+      fields:records[delIdx].fields||[],
+      worker:records[delIdx].worker||'',
+      location:records[delIdx].location||'',
+      datetime:records[delIdx].datetime||''
+    };
     records.splice(delIdx,1);save();renderList();showToast('삭제되었습니다');
-    sendToTelegram({...deleted},'🗑️ 삭제됨');
+    sendToTelegram(deleted,'🗑️ 삭제됨');
   }
   document.getElementById('dm').classList.remove('show');delIdx=-1;
 });
@@ -658,6 +663,8 @@ function makeFilename(ext){
 
 // 카메라 시작 버튼
 document.getElementById('cam-start-btn').addEventListener('click',()=>{
+  if(!currentWorker){showToast('작업자를 선택해주세요');return;}
+  if(!currentLocation){showToast('위치를 선택해주세요');return;}
   document.getElementById('cam-start-btn').style.display='none';
   document.getElementById('cam-status').style.display='block';
   startCam();
