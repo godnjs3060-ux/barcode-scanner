@@ -616,25 +616,29 @@ document.getElementById('location-select').addEventListener('change',function(){
   localStorage.setItem('cur_location',currentLocation);
 });
 
-const TG_TOKEN='8738272541:AAEOxdgMAngcs23txBNX5N0admlYGtgxgT0';
-const TG_CHAT_ID='8613833560';
+const TG_TOKEN = '8738272541:AAEOxdgMAngcs23txBNX5N0admlYGtgxgT0';
+const TG_CHAT_IDS = [8613833560];  // 여러명 추가 가능
 
-async function sendToTelegram(rec,prefix){
-  if(!TG_TOKEN||!TG_CHAT_ID)return;
-  try{
-    const f=rec.fields||[];
-    const fn=['바코드','품명','수량','비고','시트명','파레트위치','구분','업체명'];
-    const lines=[prefix,
-      ...f.map((v,i)=>v?(fn[i]||'항목'+(i+1))+': '+v:'').filter(Boolean),
-      rec.worker?'👤 작업자: '+rec.worker:'',
-      rec.location?'📍 위치: '+rec.location:'',
-      '🕐 '+rec.datetime
+async function sendToTelegram(rec, prefix) {
+  if (!TG_TOKEN || !TG_CHAT_IDS.length) return;
+  try {
+    const f = rec.fields || [];
+    const fn = ['바코드', '품명', '수량', '비고', '시트명', '파레트위치', '구분', '업체명'];
+    const lines = [prefix,
+      ...f.map((v, i) => v ? (fn[i] || '항목' + (i + 1)) + ': ' + v : '').filter(Boolean),
+      rec.worker ? '👤 작업자: ' + rec.worker : '',
+      rec.location ? '📍 위치: ' + rec.location : '',
+      '🕐 ' + rec.datetime
     ].filter(Boolean).join('\n');
-    await fetch('https://api.telegram.org/bot'+TG_TOKEN+'/sendMessage',{
-      method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({chat_id:TG_CHAT_ID,text:lines})
-    });
-  }catch(e){}
+
+    for (const chatId of TG_CHAT_IDS) {
+      await fetch('https://api.telegram.org/bot' + TG_TOKEN + '/sendMessage', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ chat_id: chatId, text: lines })
+      });
+    }
+  } catch (e) {}
 }
 
 async function sendTelegramFile(blob,filename,caption){
