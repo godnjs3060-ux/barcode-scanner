@@ -20,12 +20,9 @@
   *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
   html,body{background:var(--bg);color:var(--text);font-family:var(--font)}
   #app{max-width:480px;margin:0 auto;min-height:100vh;display:flex;flex-direction:column;padding-bottom:2rem}
-
-  /* 카메라 */
   #cam-wrap{position:sticky;top:0;z-index:10;background:#000;flex-shrink:0}
   #cam-box{position:relative;width:100%;height:200px;overflow:hidden;background:#000}
   #vid{width:100%;height:200px;object-fit:cover;display:block}
-  /* 스캔 프레임 오버레이 */
   #overlay{position:absolute;inset:0;pointer-events:none}
   #overlay canvas{position:absolute;inset:0;width:100%;height:100%}
   .frame-box{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:60%;aspect-ratio:1}
@@ -35,22 +32,17 @@
   .corner.bl{bottom:0;left:0;border-bottom-width:4px;border-left-width:4px;border-radius:0 0 0 3px}
   .corner.br{bottom:0;right:0;border-bottom-width:4px;border-right-width:4px;border-radius:0 0 3px 0}
   #cam-status{text-align:center;padding:8px;font-size:13px;background:var(--surface2);color:var(--muted);border-top:1px solid var(--border)}
-
-  /* 헤더 */
   header{padding:0.6rem 1rem;display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--border)}
   .logo{width:28px;height:28px;background:var(--accent);border-radius:6px;display:flex;align-items:center;justify-content:center}
   .logo svg{width:15px;height:15px;fill:none;stroke:#000;stroke-width:2.5}
   h1{font-size:14px;font-weight:500}
   #badge{margin-left:auto;font-size:11px;color:var(--accent);background:var(--accent-dim);padding:2px 9px;border-radius:20px}
-
-
   #worker-bar{display:flex;align-items:center;gap:6px;padding:6px 10px;background:var(--surface);border-bottom:1px solid var(--border)}
   #worker-bar label{font-size:11px;color:var(--muted);white-space:nowrap}
   #worker-bar select{flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:5px 6px;color:var(--text);font-size:12px;font-family:var(--font);outline:none;min-width:0}
   .wdiv{width:1px;height:24px;background:var(--border);flex-shrink:0}
   #cam-start-btn{display:block;width:100%;padding:11px;background:var(--accent);color:#000;border:none;font-size:14px;font-weight:500;font-family:var(--font);cursor:pointer}
   #manual-btn{display:block;width:100%;padding:9px;background:var(--surface2);color:var(--muted);border:none;border-top:1px solid var(--border);font-size:13px;cursor:pointer;font-family:var(--font)}
-  /* 수량 패널 */
   #rp-backdrop{display:none}
   #rp{display:none;position:fixed;bottom:0;left:0;right:0;background:var(--surface);border-top:2px solid var(--accent);border-radius:16px 16px 0 0;z-index:50;overflow:hidden;padding-bottom:env(safe-area-inset-bottom,8px)}
   #rp.show{display:block!important}
@@ -73,8 +65,6 @@
   .cb.s2{grid-column:span 2}
   .cb.ok{background:var(--accent);color:#000;font-family:var(--font);font-size:13px}
   .cb.ng{background:var(--surface2);color:var(--muted);font-family:var(--font);font-size:12px}
-
-  /* 목록 */
   .lhd{display:flex;align-items:center;justify-content:space-between;padding:.6rem 1rem .4rem}
   .lhd span{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
   .lbtns{display:flex;gap:5px}
@@ -92,10 +82,7 @@
   .tacts{display:flex;gap:3px}
   .tb{background:none;border:1px solid var(--border);cursor:pointer;font-size:10px;padding:2px 6px;border-radius:4px}
   .tb.te{color:var(--warn)}.tb.td{color:#555}
-
-  /* 모달 */
   .modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:200;align-items:center;justify-content:center}
-  .modal.show{display:flex}
   .modal.show{display:flex}
   .mbox{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:1.5rem;width:280px;text-align:center}
   .mbox h3{font-size:15px;font-weight:500;margin-bottom:8px}
@@ -106,11 +93,10 @@
   .myes{background:var(--danger);color:#fff}
   #em{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:200;align-items:flex-end;justify-content:center}
   #em.show{display:flex}
-  #em.show{display:flex}
   .ebox{background:var(--surface);border-radius:16px 16px 0 0;padding:1.2rem;width:100%;max-width:480px;max-height:80vh;overflow-y:auto}
   .ebox h3{font-size:14px;font-weight:500;margin-bottom:.75rem}
   .erow{display:flex;align-items:center;gap:8px;margin-bottom:8px}
-  .erow label{font-size:12px;color:var(--muted);min-width:60px}
+  .erow label{font-size:12px;color:var(--muted);min-width:70px}
   .erow input{flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:7px;padding:8px 10px;color:var(--text);font-family:var(--mono);font-size:13px;outline:none}
   .erow input:focus{border-color:var(--accent)}
   .erow input.qi{color:var(--accent)}
@@ -118,7 +104,6 @@
   .eacts button{flex:1;padding:11px;border-radius:8px;border:none;font-size:14px;cursor:pointer;font-weight:500}
   .enc{background:var(--surface2);color:var(--muted)}
   .eok{background:var(--accent);color:#000}
-
   .toast{position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%) translateY(20px);background:var(--surface2);border:1px solid var(--border);color:var(--text);font-size:13px;padding:10px 20px;border-radius:8px;opacity:0;transition:opacity .25s,transform .25s;pointer-events:none;z-index:999;white-space:nowrap}
   .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 </style>
@@ -140,13 +125,11 @@
     <div id="cam-status" style="display:none;text-align:center;padding:8px;font-size:13px;background:var(--surface2);color:var(--muted);border-top:1px solid var(--border)">스캔 중...</div>
     <button id="manual-btn">✏️ 수기입력</button>
   </div>
-
   <header>
     <div class="logo"><svg viewBox="0 0 20 20"><rect x="2" y="2" width="3" height="16" rx="1"/><rect x="7" y="2" width="1.5" height="16" rx="0.5"/><rect x="10" y="2" width="3" height="16" rx="1"/><rect x="15" y="2" width="1.5" height="16" rx="0.5"/></svg></div>
-    <h1>바코드 스캐너 <span style="font-size:10px;color:var(--muted);font-weight:400">v2.7</span></h1>
+    <h1>바코드 스캐너 <span style="font-size:10px;color:var(--muted);font-weight:400">v2.9</span></h1>
     <div id="badge">0건</div>
   </header>
-
   <div id="worker-bar">
     <label>👤</label>
     <select id="worker-select"><option value="">작업자 선택</option><option>정해원</option><option>온한섭</option><option>조민호</option><option>정해석</option><option>작업자1</option><option>작업자2</option></select>
@@ -182,7 +165,6 @@
       </div>
     </div>
   </div>
-
   <div class="lhd">
     <span>스캔 기록</span>
     <div class="lbtns">
@@ -222,16 +204,11 @@
     <div class="mbtns"><button class="mno" id="cc">취소</button><button class="myes" id="cok">삭제</button></div>
   </div>
 </div>
-<div class="toast" id="toast"></div>
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-
-
 <!-- 불러오기 확인 모달 -->
 <div class="modal" id="im">
   <div class="mbox">
     <h3>불러오기</h3>
-    <p id="im-msg">기존 데이터가 있습니다.<br>저장 후 불러올까요?</p>
+    <p>기존 데이터가 있습니다.<br>저장 후 불러올까요?</p>
     <div class="mbtns">
       <button class="mno" id="im-cancel">취소</button>
       <button class="myes" id="im-ok" style="background:var(--accent);color:#000">불러오기</button>
@@ -241,20 +218,34 @@
 <!-- 수기입력 모달 -->
 <div id="mm" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:200">
   <div style="position:absolute;bottom:0;left:0;right:0;background:var(--surface);border-radius:16px 16px 0 0;display:flex;flex-direction:column;max-height:85vh">
-    <!-- 상단 버튼 고정 -->
     <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid var(--border);flex-shrink:0">
       <h3 style="margin:0;font-size:14px;font-weight:500">✏️ 수기입력</h3>
       <div style="display:flex;gap:8px">
         <button class="enc" id="m-cancel" style="padding:7px 18px">취소</button>
         <button class="eok" id="m-ok" style="padding:7px 18px">확인</button>
       </div>
+    </div>
+    <div style="overflow-y:auto;padding:12px 16px;flex:1">
+      <div class="erow"><label>바코드</label><input type="text" id="m-f0" placeholder="*GA0014*"></div>
+      <div class="erow"><label>품명</label><input type="text" id="m-f1" placeholder="특딱파"></div>
+      <div class="erow"><label style="color:var(--accent);font-weight:500">수량</label><input type="number" id="m-f2" class="qi" placeholder="8"></div>
+      <div class="erow"><label>비고</label><input type="text" id="m-f3" placeholder="NEW"></div>
+      <div class="erow"><label>시트명</label><input type="text" id="m-f4" placeholder=""></div>
+      <div class="erow"><label>파레트위치</label><input type="text" id="m-f5" placeholder=""></div>
+      <div class="erow"><label>구분</label><input type="text" id="m-f6" placeholder=""></div>
+      <div class="erow"><label>업체명</label><input type="text" id="m-f7" placeholder=""></div>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script>
 const SK='barcode_v4';
 let records=[],expr='',defQty=1,editIdx=-1,delIdx=-1,currentCode='';
-let stream=null,raf=null,scanning=false,detector=null,lastCode='',lastTime=0;
+let stream=null,raf=null,scanning=false,detector=null,lastCode='',lastTime=0,lastResults=[];
 
-// storage
-function save(){try{localStorage.setItem(SK,JSON.stringify(records));localStorage.setItem('barcode_records_v3',JSON.stringify(records));}catch(e){}}
+function save(){try{localStorage.setItem(SK,JSON.stringify(records));}catch(e){}}
 function load(){
   try{
     for(const k of[SK,'barcode_records_v3','barcode_records_v2','barcode_records_v1']){
@@ -278,7 +269,16 @@ const toast=document.getElementById('toast');
 
 function showToast(m){toast.textContent=m;toast.classList.add('show');clearTimeout(toast._t);toast._t=setTimeout(()=>toast.classList.remove('show'),2200);}
 function fmt(d){const p=n=>String(n).padStart(2,'0');return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}:${p(d.getSeconds())}`;}
-function split(code){return code.split('/').map(s=>s.trim());}
+
+// 구형식/신형식 자동 감지
+function split(code){
+  const parts=code.split('/').map(s=>s.trim());
+  if(parts[0]){
+    const m=parts[0].match(/^(\*[^*]+\*)(.+)$/);
+    if(m){parts.splice(0,1,m[1],m[2]);}
+  }
+  return parts;
+}
 function getQty(fields){if(fields.length>=3){const v=parseFloat(fields[2]);if(!isNaN(v)&&v>0)return v;}return 1;}
 
 function evalE(e){
@@ -347,10 +347,8 @@ function onDetected(code){
   chint.textContent=fields.length>=3?`바코드 수량: ${defQty}`:'기본값 1';
   expr='';updCalc();
   rp.classList.add('show');rp.style.display='block';
-
 }
 
-// BarcodeDetector 기반 스캔 루프
 async function initDetector(){
   if(detector)return true;
   if(!('BarcodeDetector' in window)){
@@ -362,109 +360,69 @@ async function initDetector(){
   return true;
 }
 
-let lastResults=[];
-
-// 매 프레임 박스 그리기
 function drawLoop(){
   if(!scanning)return;
   const canvas=document.getElementById('scan-canvas');
   const ctx=canvas.getContext('2d');
-  // CSS 픽셀 기준으로 canvas 크기 설정
   const rect=vid.getBoundingClientRect();
-  const dw=rect.width;
-  const dh=rect.height;
+  const dw=rect.width,dh=rect.height;
   if(dw===0||dh===0){requestAnimationFrame(drawLoop);return;}
-  canvas.width=dw;
-  canvas.height=dh;
+  canvas.width=dw;canvas.height=dh;
   ctx.clearRect(0,0,dw,dh);
-  // 첫 번째 바코드만 표시
   if(lastResults.length>0&&vid.videoWidth>0){
     const r=lastResults[0];
-    // video의 object-fit:cover 오프셋 계산
     const vw=vid.videoWidth,vh=vid.videoHeight;
     const scale=Math.max(dw/vw,dh/vh);
-    const ox=(dw-vw*scale)/2;
-    const oy=(dh-vh*scale)/2;
+    const ox=(dw-vw*scale)/2,oy=(dh-vh*scale)/2;
     const pts=r.cornerPoints;
     ctx.beginPath();
     ctx.moveTo(pts[0].x*scale+ox,pts[0].y*scale+oy);
     pts.forEach(p=>ctx.lineTo(p.x*scale+ox,p.y*scale+oy));
     ctx.closePath();
-    ctx.strokeStyle='#00e5a0';
-    ctx.lineWidth=3;
-    ctx.stroke();
-    ctx.fillStyle='rgba(0,229,160,0.15)';
-    ctx.fill();
+    ctx.strokeStyle='#00e5a0';ctx.lineWidth=3;ctx.stroke();
+    ctx.fillStyle='rgba(0,229,160,0.15)';ctx.fill();
   }
   requestAnimationFrame(drawLoop);
 }
 
-// 1초마다 바코드 감지
 async function scanFrame(){
   if(!scanning)return;
   if(vid.readyState>=2){
     try{
       const vw=vid.videoWidth,vh=vid.videoHeight;
-      // 화면에 실제로 보이는 영역 계산 (object-fit:cover)
       const dispW=vid.offsetWidth,dispH=vid.offsetHeight;
       const scale=Math.max(dispW/vw,dispH/vh);
-      const visW=dispW/scale, visH=dispH/scale;
-      const offX=(vw-visW)/2, offY=(vh-visH)/2;
-      // 초록 박스 = 보이는 영역의 60% 정사각형
-      const boxRatio=0.6;
-      const bw=Math.floor(visW*boxRatio);
-      const bh=Math.floor(bw);
-      const bx=Math.floor(offX+(visW-bw)/2);
-      const by=Math.floor(offY+(visH-bh)/2);
+      const visW=dispW/scale,visH=dispH/scale;
+      const offX=(vw-visW)/2,offY=(vh-visH)/2;
+      const bw=Math.floor(visW*0.6),bh=Math.floor(visW*0.6);
+      const bx=Math.floor(offX+(visW-bw)/2),by=Math.floor(offY+(visH-bh)/2);
       const crop=document.createElement('canvas');
       crop.width=bw;crop.height=bh;
       crop.getContext('2d').drawImage(vid,bx,by,bw,bh,0,0,bw,bh);
       const results=await detector.detect(crop);
       if(results.length>0){
-        const mapped=results.map(r=>({
-          rawValue:r.rawValue,
-          cornerPoints:r.cornerPoints.map(p=>({x:p.x+bx,y:p.y+by}))
-        }));
+        const mapped=results.map(r=>({rawValue:r.rawValue,cornerPoints:r.cornerPoints.map(p=>({x:p.x+bx,y:p.y+by}))}));
         lastResults=mapped;
         onDetected(mapped[0].rawValue);
-      }else{
-        setTimeout(()=>{lastResults=[];},500);
-      }
+      }else{setTimeout(()=>{lastResults=[];},500);}
     }catch(e){}
   }
   raf=setTimeout(scanFrame,1000);
 }
 
 async function startCam(){
-  const ok=await initDetector();
-  if(!ok)return;
+  if(stream){stream.getTracks().forEach(t=>t.stop());stream=null;}
+  scanning=false;if(raf){clearTimeout(raf);raf=null;}
+  const ok=await initDetector();if(!ok)return;
   try{
-    stream=await navigator.mediaDevices.getUserMedia({
-      video:{
-        facingMode:'environment',
-        width:{ideal:1280},
-        height:{ideal:720},
-        exposureMode:'continuous',
-        whiteBalanceMode:'continuous',
-        focusMode:'continuous'
-      },
-      audio:false
-    });
-    // 밝기 자동 조정
-    const track=stream.getVideoTracks()[0];
-    try{await track.applyConstraints({advanced:[{exposureMode:'continuous',whiteBalanceMode:'continuous',focusMode:'continuous'}]});}catch(e){}
-    vid.srcObject=stream;
-    await vid.play();
+    stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment',width:{ideal:1280},height:{ideal:720}},audio:false});
+    vid.srcObject=stream;await vid.play();
     scanning=true;
     status.textContent='스캔 중... 바코드를 카메라에 비춰주세요';
-    scanFrame();
-    drawLoop();
-  }catch(e){
-    status.textContent='❌ 카메라 권한이 필요합니다: '+e.message;
-  }
+    scanFrame();drawLoop();
+  }catch(e){status.textContent='❌ 카메라 권한이 필요합니다: '+e.message;}
 }
 
-// 목록 렌더
 function maxCols(){let m=0;records.forEach(r=>{if(r.fields?.length>m)m=r.fields.length;});return m;}
 function renderList(){
   badge.textContent=records.length+'건';
@@ -473,8 +431,7 @@ function renderList(){
   let h='<table><thead><tr><th>날짜/시간</th>';
   const fn3=['바코드','품명','수량','비고','시트명','파레트위치','구분','업체명'];
   for(let i=0;i<mc;i++)h+=`<th>${fn3[i]||'항목'+(i+1)}</th>`;
-  h+='<th>작업자</th><th>위치</th>';
-  h+='<th>관리</th></tr></thead><tbody>';
+  h+='<th>작업자</th><th>위치</th><th>관리</th></tr></thead><tbody>';
   [...records].reverse().forEach((r,ri)=>{
     const idx=records.length-1-ri;
     h+=`<tr style="cursor:pointer" ondblclick="openEdit(${idx})"><td style="white-space:nowrap;font-size:10px">${r.datetime}</td>`;
@@ -491,30 +448,24 @@ function renderList(){
   tw.querySelectorAll('.tb.td').forEach(b=>b.addEventListener('click',()=>{delIdx=+b.dataset.i;document.getElementById('dm').classList.add('show');}));
 }
 
-// 수정 모달
 const FIELD_NAMES=['바코드','품명','수량','비고','시트명','파레트위치','구분','업체명'];
 function openEdit(idx){
   editIdx=idx;const r=records[idx];
   const cont=document.getElementById('efields');cont.innerHTML='';
-  // 항목 8개 고정
   for(let i=0;i<8;i++){
     const row=document.createElement('div');row.className='erow';
-    const lbl=document.createElement('label');
-    lbl.textContent=FIELD_NAMES[i];
+    const lbl=document.createElement('label');lbl.textContent=FIELD_NAMES[i];
     if(i===2)lbl.style.cssText='color:var(--accent);font-weight:500';
     const inp=document.createElement('input');
     inp.type=i===2?'number':'text';
-    inp.value=r.fields?.[i]||'';
-    inp.dataset.fi=i;
+    inp.value=r.fields?.[i]||'';inp.dataset.fi=i;
     if(i===2)inp.className='qi';
     row.append(lbl,inp);cont.appendChild(row);
   }
-  // 작업자
   const rw=document.createElement('div');rw.className='erow';
   const lw=document.createElement('label');lw.textContent='작업자';
   const iw=document.createElement('input');iw.type='text';iw.value=r.worker||'';iw.dataset.fi='worker';
   rw.append(lw,iw);cont.appendChild(rw);
-  // 위치
   const rl=document.createElement('div');rl.className='erow';
   const ll=document.createElement('label');ll.textContent='위치';
   const il=document.createElement('input');il.type='text';il.value=r.location||'';il.dataset.fi='location';
@@ -535,40 +486,30 @@ document.getElementById('es').addEventListener('click',()=>{
   sendToTelegram({...records[editIdx]},'✏️ 수정됨');
 });
 
-// 삭제
 document.getElementById('dc').addEventListener('click',()=>document.getElementById('dm').classList.remove('show'));
 document.getElementById('dok').addEventListener('click',()=>{
   if(delIdx>=0){
-    const deleted={
-      fields:records[delIdx].fields||[],
-      worker:records[delIdx].worker||'',
-      location:records[delIdx].location||'',
-      datetime:records[delIdx].datetime||''
-    };
+    const deleted={fields:records[delIdx].fields||[],worker:records[delIdx].worker||'',location:records[delIdx].location||'',datetime:records[delIdx].datetime||''};
     records.splice(delIdx,1);save();renderList();showToast('삭제되었습니다');
     sendToTelegram(deleted,'🗑️ 삭제됨');
   }
   document.getElementById('dm').classList.remove('show');delIdx=-1;
 });
 
-// 초기화
 document.getElementById('reset-btn').addEventListener('click',()=>document.getElementById('cm').classList.add('show'));
 document.getElementById('cc').addEventListener('click',()=>document.getElementById('cm').classList.remove('show'));
 document.getElementById('cok').addEventListener('click',()=>{
   records=[];save();renderList();document.getElementById('cm').classList.remove('show');showToast('초기화되었습니다');
 });
 
-// 내보내기
 function buildRows(){
   const mc=maxCols();
   const fn=['바코드','품명','수량','비고','시트명','파레트위치','구분','업체명'];
   const headers=['날짜/시간',...Array.from({length:mc},(_,i)=>fn[i]||`항목${i+1}`),'작업자','위치'];
   const rows=records.map(r=>{
     const row={'날짜/시간':r.datetime};
-    const fn2=['바코드','품명','수량','비고','시트명','파레트위치','구분','업체명'];
-    for(let i=0;i<mc;i++)row[fn2[i]||`항목${i+1}`]=r.fields?.[i]??'';
-    row['작업자']=r.worker||'';
-    row['위치']=r.location||'';
+    for(let i=0;i<mc;i++)row[fn[i]||`항목${i+1}`]=r.fields?.[i]??'';
+    row['작업자']=r.worker||'';row['위치']=r.location||'';
     return row;
   });
   return{headers,rows};
@@ -577,7 +518,6 @@ document.getElementById('csv-btn').addEventListener('click',()=>{
   if(!records.length){showToast('데이터가 없습니다');return;}
   const{headers,rows}=buildRows();
   const lines=['\uFEFF'+headers.join(','),...rows.map(r=>headers.map(h=>'"'+(r[h]??'')+'"').join(','))];
-  const a=document.createElement('a');
   const cb=new Blob([lines.join('\n')],{type:'text/csv;charset=utf-8'});
   const cn=makeFilename('csv');
   const ca=document.createElement('a');ca.href=URL.createObjectURL(cb);ca.download=cn;ca.click();
@@ -594,9 +534,7 @@ document.getElementById('xlsx-btn').addEventListener('click',()=>{
   sendTelegramFile(xb,xn,'📊 엑셀 | 총 '+records.length+'건');
 });
 
-
-let currentWorker='', currentLocation='';
-
+let currentWorker='',currentLocation='';
 function loadSelections(){
   try{
     currentWorker=localStorage.getItem('cur_worker')||'';
@@ -608,47 +546,47 @@ function loadSelections(){
   }catch(e){}
 }
 document.getElementById('worker-select').addEventListener('change',function(){
-  currentWorker=this.value;
-  localStorage.setItem('cur_worker',currentWorker);
+  currentWorker=this.value;localStorage.setItem('cur_worker',currentWorker);
 });
 document.getElementById('location-select').addEventListener('change',function(){
-  currentLocation=this.value;
-  localStorage.setItem('cur_location',currentLocation);
+  currentLocation=this.value;localStorage.setItem('cur_location',currentLocation);
 });
 
-const TG_TOKEN = '8738272541:AAEOxdgMAngcs23txBNX5N0admlYGtgxgT0';
-const TG_CHAT_IDS = [8613833560];  // 여러명 추가 가능
+// ↓↓↓ 텔레그램 설정 ↓↓↓
+const TG_TOKEN='8738272541:AAEOxdgMAngcs23txBNX5N0admlYGtgxgT0';
+const TG_CHAT_IDS=[8613833560]; // 여러 명 추가 가능: [123456, 789012]
+// ↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑
 
-async function sendToTelegram(rec, prefix) {
-  if (!TG_TOKEN || !TG_CHAT_IDS.length) return;
-  try {
-    const f = rec.fields || [];
-    const fn = ['바코드', '품명', '수량', '비고', '시트명', '파레트위치', '구분', '업체명'];
-    const lines = [prefix,
-      ...f.map((v, i) => v ? (fn[i] || '항목' + (i + 1)) + ': ' + v : '').filter(Boolean),
-      rec.worker ? '👤 작업자: ' + rec.worker : '',
-      rec.location ? '📍 위치: ' + rec.location : '',
-      '🕐 ' + rec.datetime
+async function sendToTelegram(rec,prefix){
+  if(!TG_TOKEN||!TG_CHAT_IDS.length)return;
+  try{
+    const f=rec.fields||[];
+    const fn=['바코드','품명','수량','비고','시트명','파레트위치','구분','업체명'];
+    const lines=[prefix,
+      ...f.map((v,i)=>v?(fn[i]||'항목'+(i+1))+': '+v:'').filter(Boolean),
+      rec.worker?'👤 작업자: '+rec.worker:'',
+      rec.location?'📍 위치: '+rec.location:'',
+      '🕐 '+rec.datetime
     ].filter(Boolean).join('\n');
-
-    for (const chatId of TG_CHAT_IDS) {
-      await fetch('https://api.telegram.org/bot' + TG_TOKEN + '/sendMessage', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ chat_id: chatId, text: lines })
+    for(const chatId of TG_CHAT_IDS){
+      await fetch('https://api.telegram.org/bot'+TG_TOKEN+'/sendMessage',{
+        method:'POST',headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({chat_id:chatId,text:lines})
       });
     }
-  } catch (e) {}
+  }catch(e){}
 }
 
 async function sendTelegramFile(blob,filename,caption){
-  if(!TG_TOKEN||!TG_CHAT_ID)return;
+  if(!TG_TOKEN||!TG_CHAT_IDS.length)return;
   try{
-    const form=new FormData();
-    form.append('chat_id',TG_CHAT_ID);
-    form.append('caption',caption);
-    form.append('document',blob,filename);
-    await fetch('https://api.telegram.org/bot'+TG_TOKEN+'/sendDocument',{method:'POST',body:form});
+    for(const chatId of TG_CHAT_IDS){
+      const form=new FormData();
+      form.append('chat_id',chatId);
+      form.append('caption',caption);
+      form.append('document',blob,filename);
+      await fetch('https://api.telegram.org/bot'+TG_TOKEN+'/sendDocument',{method:'POST',body:form});
+    }
   }catch(e){}
 }
 
@@ -665,7 +603,6 @@ function makeFilename(ext){
   return '재고파악_'+(currentWorker||'작업자없음')+'_'+now.getFullYear()+'-'+p(now.getMonth()+1)+'-'+p(now.getDate())+'_'+p(now.getHours())+'_'+p(now.getMinutes())+'.'+ext;
 }
 
-// 카메라 시작 버튼
 document.getElementById('cam-start-btn').addEventListener('click',()=>{
   if(!currentWorker){showToast('작업자를 선택해주세요');return;}
   if(!currentLocation){showToast('위치를 선택해주세요');return;}
@@ -674,7 +611,6 @@ document.getElementById('cam-start-btn').addEventListener('click',()=>{
   startCam();
 });
 
-// 수기입력
 document.getElementById('manual-btn').addEventListener('click',()=>{
   if(!currentWorker){showToast('작업자를 선택해주세요');return;}
   if(!currentLocation){showToast('위치를 선택해주세요');return;}
@@ -682,31 +618,20 @@ document.getElementById('manual-btn').addEventListener('click',()=>{
   document.getElementById('mm').style.display='flex';
   setTimeout(()=>document.getElementById('m-f0').focus(),100);
 });
-document.getElementById('m-cancel').addEventListener('click',()=>{
-  document.getElementById('mm').style.display='none';
-});
+document.getElementById('m-cancel').addEventListener('click',()=>document.getElementById('mm').style.display='none');
 document.getElementById('m-ok').addEventListener('click',()=>{
   const vals=['m-f0','m-f1','m-f2','m-f3','m-f4','m-f5','m-f6','m-f7'].map(id=>document.getElementById(id).value.trim());
-  // 바코드 or 품명 필수
   if(!vals[0]&&!vals[1]){showToast('바코드 또는 품명을 입력해주세요');return;}
-  // 수량 필수
   if(!vals[2]||isNaN(parseFloat(vals[2]))||parseFloat(vals[2])<=0){showToast('수량을 입력해주세요');return;}
-  if(!currentWorker){showToast('작업자를 선택해주세요');return;}
-  if(!currentLocation){showToast('위치를 선택해주세요');return;}
   document.getElementById('mm').style.display='none';
-  // 바로 저장
   const qty=parseFloat(vals[2]);
   vals[2]=String(qty);
-  const fields=vals;
-  const rec={barcode:fields.join('/'),fields,datetime:fmt(new Date()),qty,worker:currentWorker,location:currentLocation};
-  records.push(rec);
-  save();renderList();
-  sendToTelegram(rec,'✏️ 수기입력');
-  sendToSheet(rec);
+  const rec={barcode:vals.join('/'),fields:vals,datetime:fmt(new Date()),qty,worker:currentWorker,location:currentLocation};
+  records.push(rec);save();renderList();
+  sendToTelegram(rec,'✏️ 수기입력');sendToSheet(rec);
   showToast('저장되었습니다');
 });
 
-// 불러오기
 let pendingImportFile=null;
 function doImport(file){
   if(!file)return;
@@ -740,49 +665,24 @@ function doImport(file){
 document.getElementById('import-file').addEventListener('change',function(e){
   const file=e.target.files[0];if(!file)return;
   this.value='';
-  if(records.length>0){
-    pendingImportFile=file;
-    document.getElementById('im').classList.add('show');
-  }else{
-    doImport(file);
-  }
+  if(records.length>0){pendingImportFile=file;document.getElementById('im').classList.add('show');}
+  else{doImport(file);}
 });
-document.getElementById('im-cancel').addEventListener('click',()=>{
-  document.getElementById('im').classList.remove('show');
-  pendingImportFile=null;
-});
+document.getElementById('im-cancel').addEventListener('click',()=>{document.getElementById('im').classList.remove('show');pendingImportFile=null;});
 document.getElementById('im-ok').addEventListener('click',()=>{
   document.getElementById('im').classList.remove('show');
-  // 기존 데이터 CSV로 저장 후 불러오기
   if(records.length>0){
     const{headers,rows}=buildRows();
-    const lines=['﻿'+headers.join(','),...rows.map(r=>headers.map(h=>'"'+(r[h]??'')+'"').join(','))];
+    const lines=['\uFEFF'+headers.join(','),...rows.map(r=>headers.map(h=>'"'+(r[h]??'')+'"').join(','))];
     const blob=new Blob([lines.join('\n')],{type:'text/csv;charset=utf-8'});
-    const a=document.createElement('a');a.href=URL.createObjectURL(blob);
-    a.download=makeFilename('csv');a.click();
+    const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=makeFilename('csv');a.click();
   }
-  doImport(pendingImportFile);
-  pendingImportFile=null;
+  doImport(pendingImportFile);pendingImportFile=null;
 });
 
 document.getElementById('rp-backdrop').addEventListener('click',()=>{rp.classList.remove('show');expr='';});
 load();renderList();
 setTimeout(loadSelections,50);
 </script>
-
-    </div>
-    <!-- 입력창 스크롤 -->
-    <div style="overflow-y:auto;padding:12px 16px;flex:1">
-      <div class="erow"><label>바코드</label><input type="text" id="m-f0" placeholder="*GA0014*"></div>
-      <div class="erow"><label>품명</label><input type="text" id="m-f1" placeholder="특딱파"></div>
-      <div class="erow"><label style="color:var(--accent);font-weight:500">수량</label><input type="number" id="m-f2" class="qi" placeholder="8"></div>
-      <div class="erow"><label>비고</label><input type="text" id="m-f3" placeholder="NEW"></div>
-      <div class="erow"><label>시트명</label><input type="text" id="m-f4" placeholder=""></div>
-      <div class="erow"><label>파레트위치</label><input type="text" id="m-f5" placeholder=""></div>
-      <div class="erow"><label>구분</label><input type="text" id="m-f6" placeholder=""></div>
-      <div class="erow"><label>업체명</label><input type="text" id="m-f7" placeholder=""></div>
-    </div>
-  </div>
-</div>
 </body>
 </html>
