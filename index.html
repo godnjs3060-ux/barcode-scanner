@@ -15,6 +15,9 @@
     --bg:#0f0f0f;--surface:#1a1a1a;--surface2:#242424;--border:#2e2e2e;
     --accent:#00e5a0;--accent-dim:#003d2b;--text:#f0f0f0;--muted:#888;
     --danger:#ff4d4d;--warn:#f5a623;
+    --mode-in:#3b82f6;--mode-in-dim:#1e3a5f;
+    --mode-out:#f97316;--mode-out-dim:#5a2d0f;
+    --mode-inv:#00e5a0;--mode-inv-dim:#003d2b;
     --font:'Noto Sans KR',sans-serif;--mono:monospace;
   }
   *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
@@ -31,25 +34,51 @@
   .corner.tr{top:0;right:0;border-top-width:4px;border-right-width:4px;border-radius:0 3px 0 0}
   .corner.bl{bottom:0;left:0;border-bottom-width:4px;border-left-width:4px;border-radius:0 0 0 3px}
   .corner.br{bottom:0;right:0;border-bottom-width:4px;border-right-width:4px;border-radius:0 0 3px 0}
+  body.mode-in .corner{border-color:var(--mode-in)}
+  body.mode-out .corner{border-color:var(--mode-out)}
+  body.mode-inv .corner{border-color:var(--mode-inv)}
   #cam-status{text-align:center;padding:8px;font-size:13px;background:var(--surface2);color:var(--muted);border-top:1px solid var(--border)}
   header{padding:0.6rem 1rem;display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--border)}
-  .logo{width:28px;height:28px;background:var(--accent);border-radius:6px;display:flex;align-items:center;justify-content:center}
+  .logo{width:28px;height:28px;background:var(--accent);border-radius:6px;display:flex;align-items:center;justify-content:center;transition:background .2s}
+  body.mode-in .logo{background:var(--mode-in)}
+  body.mode-out .logo{background:var(--mode-out)}
+  body.mode-inv .logo{background:var(--mode-inv)}
   .logo svg{width:15px;height:15px;fill:none;stroke:#000;stroke-width:2.5}
   h1{font-size:14px;font-weight:500}
-  #badge{margin-left:auto;font-size:11px;color:var(--accent);background:var(--accent-dim);padding:2px 9px;border-radius:20px}
+  #badge{margin-left:auto;font-size:11px;color:var(--accent);background:var(--accent-dim);padding:2px 9px;border-radius:20px;transition:all .2s}
+  body.mode-in #badge{color:var(--mode-in);background:var(--mode-in-dim)}
+  body.mode-out #badge{color:var(--mode-out);background:var(--mode-out-dim)}
+  body.mode-inv #badge{color:var(--mode-inv);background:var(--mode-inv-dim)}
+  /* 모드 토글 (세그먼트 컨트롤 스타일) */
+  #mode-bar{padding:8px 10px;border-bottom:1px solid var(--border);background:var(--surface)}
+  .mode-toggle{display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px;background:#0a0a0a;border:1px solid var(--border);border-radius:10px;padding:3px}
+  .mbtn{padding:10px 4px;border:none;background:transparent;color:var(--muted);font-family:var(--font);font-size:13px;font-weight:500;cursor:pointer;border-radius:7px;transition:all .18s cubic-bezier(.4,0,.2,1);position:relative}
+  .mbtn:active{transform:scale(.97)}
+  .mbtn.active{color:#fff;font-weight:600;box-shadow:0 2px 6px rgba(0,0,0,.3)}
+  .mbtn[data-mode="in"].active{background:var(--mode-in);color:#fff}
+  .mbtn[data-mode="out"].active{background:var(--mode-out);color:#fff}
+  .mbtn[data-mode="inv"].active{background:var(--mode-inv);color:#000}
   #worker-bar{display:flex;align-items:center;gap:6px;padding:6px 10px;background:var(--surface);border-bottom:1px solid var(--border)}
   #worker-bar label{font-size:11px;color:var(--muted);white-space:nowrap}
   #worker-bar select{flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:5px 6px;color:var(--text);font-size:12px;font-family:var(--font);outline:none;min-width:0}
   .wdiv{width:1px;height:24px;background:var(--border);flex-shrink:0}
-  #cam-start-btn{display:block;width:100%;padding:11px;background:var(--accent);color:#000;border:none;font-size:14px;font-weight:500;font-family:var(--font);cursor:pointer}
+  #cam-start-btn{display:block;width:100%;padding:11px;background:var(--accent);color:#000;border:none;font-size:14px;font-weight:500;font-family:var(--font);cursor:pointer;transition:background .2s}
+  body.mode-in #cam-start-btn{background:var(--mode-in);color:#fff}
+  body.mode-out #cam-start-btn{background:var(--mode-out);color:#fff}
+  body.mode-inv #cam-start-btn{background:var(--mode-inv);color:#000}
   #manual-btn{display:block;width:100%;padding:9px;background:var(--surface2);color:var(--muted);border:none;border-top:1px solid var(--border);font-size:13px;cursor:pointer;font-family:var(--font)}
   #rp-backdrop{display:none}
   #rp{display:none;position:fixed;bottom:0;left:0;right:0;background:var(--surface);border-top:2px solid var(--accent);border-radius:16px 16px 0 0;z-index:50;overflow:hidden;padding-bottom:env(safe-area-inset-bottom,8px)}
+  body.mode-in #rp{border-top-color:var(--mode-in)}
+  body.mode-out #rp{border-top-color:var(--mode-out)}
+  body.mode-inv #rp{border-top-color:var(--mode-inv)}
   #rp.show{display:block!important}
   .rph{padding:4px 9px;border-bottom:1px solid var(--border);font-size:10px;color:var(--muted)}
   #fp{display:flex;flex-wrap:wrap;gap:3px;padding:3px 7px}
   .chip{background:var(--surface2);color:var(--text);font-size:10px;padding:1px 5px;border-radius:4px;border:1px solid var(--border);font-family:var(--mono)}
   .chip.q{background:var(--accent-dim);color:var(--accent);border-color:transparent}
+  body.mode-in .chip.q{background:var(--mode-in-dim);color:var(--mode-in)}
+  body.mode-out .chip.q{background:var(--mode-out-dim);color:var(--mode-out)}
   .cnum{font-size:9px;color:var(--muted);margin-right:2px}
   .cw{padding:4px 6px 6px}
   .cd{background:var(--surface2);border-radius:6px;padding:3px 10px;margin-bottom:3px;text-align:right}
@@ -61,9 +90,13 @@
   .cb{padding:8px 0;border:none;border-radius:6px;font-size:13px;font-weight:500;cursor:pointer;background:var(--surface2);color:var(--text);font-family:var(--mono)}
   .cb:active{opacity:.7;transform:scale(.96)}
   .cb.op{background:#1e2e28;color:var(--accent)}
+  body.mode-in .cb.op{background:#1e283c;color:var(--mode-in)}
+  body.mode-out .cb.op{background:#2e2015;color:var(--mode-out)}
   .cb.act{background:#1a1a2e;color:#7b8cde;font-size:13px;font-family:var(--font)}
   .cb.s2{grid-column:span 2}
   .cb.ok{background:var(--accent);color:#000;font-family:var(--font);font-size:13px}
+  body.mode-in .cb.ok{background:var(--mode-in);color:#fff}
+  body.mode-out .cb.ok{background:var(--mode-out);color:#fff}
   .cb.ng{background:var(--surface2);color:var(--muted);font-family:var(--font);font-size:12px}
   .lhd{display:flex;align-items:center;justify-content:space-between;padding:.6rem 1rem .4rem}
   .lhd span{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
@@ -72,13 +105,23 @@
   .xb.e{background:var(--surface2);color:var(--muted);border:1px solid var(--border)}
   .xb.r{background:transparent;color:var(--danger);border:1px solid var(--danger)}
   #tw{overflow-x:auto;margin:0 .5rem;border-radius:10px;border:1px solid var(--border)}
-  table{width:100%;border-collapse:collapse;font-size:11px;min-width:480px}
+  table{width:100%;border-collapse:collapse;font-size:11px;min-width:520px}
   thead{background:var(--surface2)}
   th{padding:6px 8px;text-align:left;color:var(--muted);font-weight:500;white-space:nowrap;border-bottom:1px solid var(--border)}
   td{padding:6px 8px;border-bottom:1px solid var(--border);color:var(--text);vertical-align:middle;font-family:var(--mono)}
   tr:last-child td{border-bottom:none}
   tr:hover td{background:var(--surface2)}
-  .tq{color:var(--accent);font-weight:500}
+  .tq{color:var(--accent);font-weight:500;cursor:pointer;position:relative}
+  .tq:hover{background:var(--surface2)}
+  .tq:after{content:"✏️";font-size:8px;margin-left:3px;opacity:.5}
+  .tq.editing{background:var(--surface2);padding:2px 4px!important}
+  .tq input{width:70px;background:var(--bg);border:1px solid var(--accent);color:var(--accent);border-radius:4px;padding:4px 6px;font-family:var(--mono);font-size:13px;font-weight:500;text-align:right;outline:none}
+  body.mode-in .tq input{border-color:var(--mode-in);color:var(--mode-in)}
+  body.mode-out .tq input{border-color:var(--mode-out);color:var(--mode-out)}
+  .tmode{font-size:10px;font-weight:500;padding:1px 6px;border-radius:4px;display:inline-block;white-space:nowrap}
+  .tmode.in{background:var(--mode-in-dim);color:var(--mode-in)}
+  .tmode.out{background:var(--mode-out-dim);color:var(--mode-out)}
+  .tmode.inv{background:var(--mode-inv-dim);color:var(--mode-inv)}
   .tacts{display:flex;gap:3px}
   .tb{background:none;border:1px solid var(--border);cursor:pointer;font-size:10px;padding:2px 6px;border-radius:4px}
   .tb.te{color:var(--warn)}.tb.td{color:#555}
@@ -97,18 +140,20 @@
   .ebox h3{font-size:14px;font-weight:500;margin-bottom:.75rem}
   .erow{display:flex;align-items:center;gap:8px;margin-bottom:8px}
   .erow label{font-size:12px;color:var(--muted);min-width:70px}
-  .erow input{flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:7px;padding:8px 10px;color:var(--text);font-family:var(--mono);font-size:13px;outline:none}
-  .erow input:focus{border-color:var(--accent)}
+  .erow input,.erow select{flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:7px;padding:8px 10px;color:var(--text);font-family:var(--mono);font-size:13px;outline:none}
+  .erow input:focus,.erow select:focus{border-color:var(--accent)}
   .erow input.qi{color:var(--accent)}
   .eacts{display:flex;gap:8px;margin-top:12px}
   .eacts button{flex:1;padding:11px;border-radius:8px;border:none;font-size:14px;cursor:pointer;font-weight:500}
   .enc{background:var(--surface2);color:var(--muted)}
   .eok{background:var(--accent);color:#000}
+  body.mode-in .eok{background:var(--mode-in);color:#fff}
+  body.mode-out .eok{background:var(--mode-out);color:#fff}
   .toast{position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%) translateY(20px);background:var(--surface2);border:1px solid var(--border);color:var(--text);font-size:13px;padding:10px 20px;border-radius:8px;opacity:0;transition:opacity .25s,transform .25s;pointer-events:none;z-index:999;white-space:nowrap}
   .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 </style>
 </head>
-<body>
+<body class="mode-inv">
 <div id="app">
   <div id="cam-wrap">
     <div id="cam-box">
@@ -127,15 +172,28 @@
   </div>
   <header>
     <div class="logo"><svg viewBox="0 0 20 20"><rect x="2" y="2" width="3" height="16" rx="1"/><rect x="7" y="2" width="1.5" height="16" rx="0.5"/><rect x="10" y="2" width="3" height="16" rx="1"/><rect x="15" y="2" width="1.5" height="16" rx="0.5"/></svg></div>
-    <h1>바코드 스캐너 <span style="font-size:10px;color:var(--muted);font-weight:400">v2.9</span></h1>
+    <h1>바코드 스캐너 <span style="font-size:10px;color:var(--muted);font-weight:400">v3.0</span></h1>
     <div id="badge">0건</div>
   </header>
+  <!-- 📊 모드 토글 -->
+  <div id="mode-bar">
+    <div class="mode-toggle">
+      <button class="mbtn" data-mode="in">📥 입고</button>
+      <button class="mbtn" data-mode="out">📤 출고</button>
+      <button class="mbtn active" data-mode="inv">📋 재고파악</button>
+    </div>
+  </div>
   <div id="worker-bar">
     <label>👤</label>
     <select id="worker-select"><option value="">작업자 선택</option><option>정해원</option><option>온한섭</option><option>조민호</option><option>정해석</option><option>작업자1</option><option>작업자2</option></select>
     <div class="wdiv"></div>
-    <label>📍</label>
-    <select id="location-select"><option value="">위치 선택</option><option>매장</option><option>1번냉동</option><option>2번냉동</option><option>3번냉동</option><option>4번냉동</option></select>
+    <label id="ctx-label">📍</label>
+    <select id="ctx-select"></select>
+  </div>
+  <div id="ctx-custom-bar" style="display:flex;align-items:center;gap:6px;padding:4px 10px 6px;background:var(--surface);border-bottom:1px solid var(--border)">
+    <label style="font-size:11px;color:var(--muted);white-space:nowrap">✏️</label>
+    <input id="ctx-custom" type="text" placeholder="직접 입력 (선택사항 — 드롭다운 대신 사용)" style="flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:5px 8px;color:var(--text);font-size:12px;font-family:var(--font);outline:none;min-width:0">
+    <button id="ctx-custom-clear" style="background:var(--surface2);border:1px solid var(--border);border-radius:5px;color:var(--muted);font-size:10px;padding:4px 8px;cursor:pointer;font-family:var(--font)">지우기</button>
   </div>
   <div id="rp-backdrop"></div>
   <div id="rp">
@@ -241,18 +299,50 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script>
-const SK='barcode_v4';
+const SK='barcode_v5';
 let records=[],expr='',defQty=1,editIdx=-1,delIdx=-1,currentCode='';
 let stream=null,raf=null,scanning=false,detector=null,lastCode='',lastTime=0,lastResults=[];
+
+// ===== 모드 설정 =====
+// 각 모드별 컨텍스트 드롭다운 옵션 (수정 시 여기만 바꾸면 됨)
+const MODE_CONFIG={
+  'in': {
+    label:'📦',
+    ctxLabel:'입고사유',
+    options:['생산입고','거래처입고','반품입고','입고누락','기타오차'],
+    emoji:'📥',
+    name:'입고'
+  },
+  'out': {
+    label:'🚚',
+    ctxLabel:'출고사유',
+    options:['사장님출고','재가공 출고','출고누락','기타오차'],
+    emoji:'📤',
+    name:'출고'
+  },
+  'inv': {
+    label:'📍',
+    ctxLabel:'위치',
+    options:['매장','1번냉동','2번냉동','3번냉동','4번냉동'],
+    emoji:'📋',
+    name:'재고파악'
+  }
+};
+let currentMode='inv';  // 'in' | 'out' | 'inv'
 
 function save(){try{localStorage.setItem(SK,JSON.stringify(records));}catch(e){}}
 function load(){
   try{
-    for(const k of[SK,'barcode_records_v3','barcode_records_v2','barcode_records_v1']){
+    for(const k of[SK,'barcode_v4','barcode_records_v3','barcode_records_v2','barcode_records_v1']){
       const d=localStorage.getItem(k);
       if(d){records=JSON.parse(d);break;}
     }
-    records=records.map(r=>{if(!r.fields)r.fields=split(r.barcode||'');return r;});
+    records=records.map(r=>{
+      if(!r.fields)r.fields=split(r.barcode||'');
+      if(!r.mode)r.mode='inv'; // 기존 데이터는 재고파악으로 취급
+      if(!r.ctx)r.ctx=r.location||'';  // 예전 location 필드 → ctx로 마이그레이션
+      return r;
+    });
   }catch(e){records=[];}
 }
 
@@ -270,7 +360,6 @@ const toast=document.getElementById('toast');
 function showToast(m){toast.textContent=m;toast.classList.add('show');clearTimeout(toast._t);toast._t=setTimeout(()=>toast.classList.remove('show'),2200);}
 function fmt(d){const p=n=>String(n).padStart(2,'0');return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}:${p(d.getSeconds())}`;}
 
-// 구형식/신형식 자동 감지
 function split(code){
   const parts=code.split('/').map(s=>s.trim());
   if(parts[0]){
@@ -317,15 +406,24 @@ document.querySelector('.cgrid').addEventListener('click',e=>{
 document.getElementById('save-btn').addEventListener('click',()=>{
   if(!currentCode){showToast('스캔된 바코드가 없습니다');return;}
   if(!currentWorker){showToast('작업자를 선택해주세요');return;}
-  if(!currentLocation){showToast('위치를 선택해주세요');return;}
+  // 사유/위치는 선택사항 — 직접입력 있으면 그거, 없으면 드롭다운, 둘 다 없으면 빈값 OK
+  const customVal=(document.getElementById('ctx-custom')||{}).value?.trim()||'';
+  const finalCtx=customVal||currentCtx||'';
   const qty=finalQty();
   if(qty===null){showToast('올바른 수량을 입력해주세요');return;}
   const fields=split(currentCode);
   while(fields.length<3)fields.push('');
   fields[2]=String(qty);
-  const rec={barcode:currentCode,fields,datetime:fmt(new Date()),qty,worker:currentWorker,location:currentLocation};
+  const rec={
+    barcode:currentCode,fields,datetime:fmt(new Date()),qty,
+    worker:currentWorker,
+    mode:currentMode,
+    ctx:finalCtx,
+    // 호환성: 재고파악 모드에선 location 도 유지
+    location:(currentMode==='inv')?finalCtx:''
+  };
   records.push(rec);
-  sendToTelegram(rec,'📦 바코드 스캔');
+  sendToTelegram(rec,MODE_CONFIG[currentMode].emoji+' '+MODE_CONFIG[currentMode].name);
   sendToSheet(rec);
   save();
   rp.classList.remove('show');rp.style.display='none';
@@ -379,8 +477,11 @@ function drawLoop(){
     ctx.moveTo(pts[0].x*scale+ox,pts[0].y*scale+oy);
     pts.forEach(p=>ctx.lineTo(p.x*scale+ox,p.y*scale+oy));
     ctx.closePath();
-    ctx.strokeStyle='#00e5a0';ctx.lineWidth=3;ctx.stroke();
-    ctx.fillStyle='rgba(0,229,160,0.15)';ctx.fill();
+    // 모드별 색상
+    const clr=currentMode==='in'?'#3b82f6':currentMode==='out'?'#f97316':'#00e5a0';
+    ctx.strokeStyle=clr;ctx.lineWidth=3;ctx.stroke();
+    ctx.fillStyle=(currentMode==='in'?'rgba(59,130,246,0.15)':currentMode==='out'?'rgba(249,115,22,0.15)':'rgba(0,229,160,0.15)');
+    ctx.fill();
   }
   requestAnimationFrame(drawLoop);
 }
@@ -424,34 +525,94 @@ async function startCam(){
 }
 
 function maxCols(){let m=0;records.forEach(r=>{if(r.fields?.length>m)m=r.fields.length;});return m;}
+function modeChip(mode){
+  const info=MODE_CONFIG[mode]||MODE_CONFIG.inv;
+  return `<span class="tmode ${mode}">${info.emoji} ${info.name}</span>`;
+}
 function renderList(){
   badge.textContent=records.length+'건';
   if(!records.length){tw.innerHTML='<div style="padding:2.5rem 0;text-align:center;color:var(--muted);font-size:13px;line-height:2">아직 스캔된 항목이 없습니다</div>';return;}
   const mc=maxCols();
-  let h='<table><thead><tr><th>날짜/시간</th>';
+  let h='<table><thead><tr><th>날짜/시간</th><th>모드</th>';
   const fn3=['바코드','품명','수량','비고','시트명','파레트위치','구분','업체명'];
   for(let i=0;i<mc;i++)h+=`<th>${fn3[i]||'항목'+(i+1)}</th>`;
-  h+='<th>작업자</th><th>위치</th><th>관리</th></tr></thead><tbody>';
+  h+='<th>작업자</th><th>사유/위치</th><th>관리</th></tr></thead><tbody>';
   [...records].reverse().forEach((r,ri)=>{
     const idx=records.length-1-ri;
-    h+=`<tr style="cursor:pointer" ondblclick="openEdit(${idx})"><td style="white-space:nowrap;font-size:10px">${r.datetime}</td>`;
+    h+=`<tr><td style="white-space:nowrap;font-size:10px">${r.datetime}</td>`;
+    h+=`<td>${modeChip(r.mode||'inv')}</td>`;
     for(let c=0;c<mc;c++){
       const v=r.fields?.[c]??'';
-      h+=c===2?`<td class="tq">${v}</td>`:`<td>${v}</td>`;
+      if(c===2){
+        h+=`<td class="tq" data-idx="${idx}" title="클릭해서 수량 수정">${v}</td>`;
+      } else {
+        h+=`<td>${v}</td>`;
+      }
     }
-    h+=`<td>${r.worker||''}</td><td>${r.location||''}</td>`;
+    h+=`<td>${r.worker||''}</td><td>${r.ctx||r.location||''}</td>`;
     h+=`<td><div class="tacts"><button class="tb te" data-i="${idx}">수정</button><button class="tb td" data-i="${idx}">삭제</button></div></td></tr>`;
   });
   h+='</tbody></table>';
   tw.innerHTML=h;
   tw.querySelectorAll('.tb.te').forEach(b=>b.addEventListener('click',()=>openEdit(+b.dataset.i)));
   tw.querySelectorAll('.tb.td').forEach(b=>b.addEventListener('click',()=>{delIdx=+b.dataset.i;document.getElementById('dm').classList.add('show');}));
+  // 수량 셀 클릭 → 인라인 수정
+  tw.querySelectorAll('.tq').forEach(cell=>{
+    cell.addEventListener('click',function(){
+      if(this.classList.contains('editing'))return;
+      const idx=+this.dataset.idx;
+      const curVal=this.textContent.trim();
+      this.classList.add('editing');
+      this.innerHTML='';
+      const inp=document.createElement('input');
+      inp.type='number';inp.value=curVal;inp.min='0';inp.step='any';
+      this.appendChild(inp);
+      inp.focus();inp.select();
+      const saveEdit=()=>{
+        const q=parseFloat(inp.value);
+        if(!isNaN(q)&&q>0){
+          const r=records[idx];
+          const oldVal=r.fields?.[2];
+          while(r.fields.length<3)r.fields.push('');
+          r.fields[2]=String(q);
+          r.qty=q;
+          save();renderList();
+          if(String(oldVal)!==String(q)){
+            showToast('수량 '+oldVal+' → '+q+' 수정됨');
+            sendToTelegram({...r},'✏️ 수량 수정 ('+oldVal+'→'+q+')');
+          }
+        } else {
+          this.classList.remove('editing');
+          this.textContent=curVal;
+        }
+      };
+      const cancelEdit=()=>{
+        this.classList.remove('editing');
+        this.textContent=curVal;
+      };
+      inp.addEventListener('keydown',function(e){
+        if(e.key==='Enter'){e.preventDefault();saveEdit();}
+        else if(e.key==='Escape'){e.preventDefault();cancelEdit();}
+      });
+      inp.addEventListener('blur',saveEdit);
+    });
+  });
 }
 
 const FIELD_NAMES=['바코드','품명','수량','비고','시트명','파레트위치','구분','업체명'];
 function openEdit(idx){
   editIdx=idx;const r=records[idx];
   const cont=document.getElementById('efields');cont.innerHTML='';
+  // 모드 선택
+  const rm=document.createElement('div');rm.className='erow';
+  const lm=document.createElement('label');lm.textContent='모드';
+  const im=document.createElement('select');
+  ['in','out','inv'].forEach(m=>{
+    const o=document.createElement('option');o.value=m;o.textContent=MODE_CONFIG[m].emoji+' '+MODE_CONFIG[m].name;
+    if((r.mode||'inv')===m)o.selected=true;im.appendChild(o);
+  });
+  im.dataset.fi='mode';
+  rm.append(lm,im);cont.appendChild(rm);
   for(let i=0;i<8;i++){
     const row=document.createElement('div');row.className='erow';
     const lbl=document.createElement('label');lbl.textContent=FIELD_NAMES[i];
@@ -467,18 +628,19 @@ function openEdit(idx){
   const iw=document.createElement('input');iw.type='text';iw.value=r.worker||'';iw.dataset.fi='worker';
   rw.append(lw,iw);cont.appendChild(rw);
   const rl=document.createElement('div');rl.className='erow';
-  const ll=document.createElement('label');ll.textContent='위치';
-  const il=document.createElement('input');il.type='text';il.value=r.location||'';il.dataset.fi='location';
+  const ll=document.createElement('label');ll.textContent='사유/위치';
+  const il=document.createElement('input');il.type='text';il.value=r.ctx||r.location||'';il.dataset.fi='ctx';
   rl.append(ll,il);cont.appendChild(rl);
   document.getElementById('em').classList.add('show');
 }
 document.getElementById('ec').addEventListener('click',()=>document.getElementById('em').classList.remove('show'));
 document.getElementById('es').addEventListener('click',()=>{
   const r=records[editIdx];
-  document.querySelectorAll('#efields input').forEach(inp=>{
+  document.querySelectorAll('#efields input, #efields select').forEach(inp=>{
     const fi=inp.dataset.fi;
     if(fi==='worker')r.worker=inp.value.trim();
-    else if(fi==='location')r.location=inp.value.trim();
+    else if(fi==='ctx'){r.ctx=inp.value.trim();r.location=(r.mode==='inv')?r.ctx:'';}
+    else if(fi==='mode')r.mode=inp.value;
     else r.fields[+fi]=inp.value.trim();
   });
   const q=parseFloat(r.fields[2]);r.qty=(!isNaN(q)&&q>0)?q:1;
@@ -489,7 +651,8 @@ document.getElementById('es').addEventListener('click',()=>{
 document.getElementById('dc').addEventListener('click',()=>document.getElementById('dm').classList.remove('show'));
 document.getElementById('dok').addEventListener('click',()=>{
   if(delIdx>=0){
-    const deleted={fields:records[delIdx].fields||[],worker:records[delIdx].worker||'',location:records[delIdx].location||'',datetime:records[delIdx].datetime||''};
+    const d=records[delIdx];
+    const deleted={fields:d.fields||[],worker:d.worker||'',ctx:d.ctx||d.location||'',datetime:d.datetime||'',mode:d.mode||'inv'};
     records.splice(delIdx,1);save();renderList();showToast('삭제되었습니다');
     sendToTelegram(deleted,'🗑️ 삭제됨');
   }
@@ -502,54 +665,128 @@ document.getElementById('cok').addEventListener('click',()=>{
   records=[];save();renderList();document.getElementById('cm').classList.remove('show');showToast('초기화되었습니다');
 });
 
-function buildRows(){
-  const mc=maxCols();
+// 모드별로 레코드 필터링 + 해당 모드의 행/헤더 구성
+function buildRowsByMode(mode){
+  const filtered=records.filter(r=>(r.mode||'inv')===mode);
+  if(!filtered.length) return null;
+  let mc=0; filtered.forEach(r=>{if(r.fields?.length>mc)mc=r.fields.length;});
   const fn=['바코드','품명','수량','비고','시트명','파레트위치','구분','업체명'];
-  const headers=['날짜/시간',...Array.from({length:mc},(_,i)=>fn[i]||`항목${i+1}`),'작업자','위치'];
-  const rows=records.map(r=>{
+  const info=MODE_CONFIG[mode];
+  // 모드별 사유/위치 컬럼명
+  const ctxColName=info?info.ctxLabel:'사유/위치';
+  const headers=['날짜/시간',...Array.from({length:mc},(_,i)=>fn[i]||`항목${i+1}`),'작업자',ctxColName];
+  const rows=filtered.map(r=>{
     const row={'날짜/시간':r.datetime};
     for(let i=0;i<mc;i++)row[fn[i]||`항목${i+1}`]=r.fields?.[i]??'';
-    row['작업자']=r.worker||'';row['위치']=r.location||'';
+    row['작업자']=r.worker||'';
+    row[ctxColName]=r.ctx||r.location||'';
     return row;
   });
-  return{headers,rows};
+  return{headers,rows,mode,count:filtered.length};
 }
+// 파일명 (모드별)
+function makeFilenameByMode(mode,ext){
+  const now=new Date(),p=n=>String(n).padStart(2,'0');
+  const modeName=MODE_CONFIG[mode]?.name||'기록';
+  return modeName+'_'+(currentWorker||'작업자없음')+'_'+now.getFullYear()+'-'+p(now.getMonth()+1)+'-'+p(now.getDate())+'_'+p(now.getHours())+'_'+p(now.getMinutes())+'.'+ext;
+}
+
 document.getElementById('csv-btn').addEventListener('click',()=>{
   if(!records.length){showToast('데이터가 없습니다');return;}
-  const{headers,rows}=buildRows();
-  const lines=['\uFEFF'+headers.join(','),...rows.map(r=>headers.map(h=>'"'+(r[h]??'')+'"').join(','))];
-  const cb=new Blob([lines.join('\n')],{type:'text/csv;charset=utf-8'});
-  const cn=makeFilename('csv');
-  const ca=document.createElement('a');ca.href=URL.createObjectURL(cb);ca.download=cn;ca.click();
-  sendTelegramFile(cb,cn,'📊 CSV | 총 '+records.length+'건');
-});
-document.getElementById('xlsx-btn').addEventListener('click',()=>{
-  if(!records.length){showToast('데이터가 없습니다');return;}
-  const{rows}=buildRows();
-  const ws=XLSX.utils.json_to_sheet(rows);
-  const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'스캔기록');
-  const xn=makeFilename('xlsx');
-  const xb=new Blob([XLSX.write(wb,{bookType:'xlsx',type:'array'})],{type:'application/octet-stream'});
-  const xa=document.createElement('a');xa.href=URL.createObjectURL(xb);xa.download=xn;xa.click();
-  sendTelegramFile(xb,xn,'📊 엑셀 | 총 '+records.length+'건');
+  let exportedCnt=0;
+  ['in','out','inv'].forEach(mode=>{
+    const r=buildRowsByMode(mode);if(!r)return;
+    const info=MODE_CONFIG[mode];
+    const lines=['\uFEFF'+r.headers.join(','),...r.rows.map(row=>r.headers.map(h=>'"'+(row[h]??'')+'"').join(','))];
+    const blob=new Blob([lines.join('\n')],{type:'text/csv;charset=utf-8'});
+    const fname=makeFilenameByMode(mode,'csv');
+    const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=fname;a.click();
+    sendTelegramFile(blob,fname,info.emoji+' '+info.name+' CSV | '+r.count+'건');
+    exportedCnt++;
+  });
+  showToast(exportedCnt+'개 모드 CSV 내보냈습니다');
 });
 
-let currentWorker='',currentLocation='';
+document.getElementById('xlsx-btn').addEventListener('click',()=>{
+  if(!records.length){showToast('데이터가 없습니다');return;}
+  let exportedCnt=0;
+  ['in','out','inv'].forEach(mode=>{
+    const r=buildRowsByMode(mode);if(!r)return;
+    const info=MODE_CONFIG[mode];
+    const ws=XLSX.utils.json_to_sheet(r.rows);
+    const wb=XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb,ws,info.name);
+    const fname=makeFilenameByMode(mode,'xlsx');
+    const blob=new Blob([XLSX.write(wb,{bookType:'xlsx',type:'array'})],{type:'application/octet-stream'});
+    const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=fname;a.click();
+    sendTelegramFile(blob,fname,info.emoji+' '+info.name+' 엑셀 | '+r.count+'건');
+    exportedCnt++;
+  });
+  showToast(exportedCnt+'개 모드 엑셀 내보냈습니다');
+});
+
+let currentWorker='',currentCtx='';
+
+// 모드 전환 — UI 업데이트 + 드롭다운 재구성 + 저장
+function setMode(mode, silent){
+  const prevMode=currentMode;
+  currentMode=mode;
+  document.body.classList.remove('mode-in','mode-out','mode-inv');
+  document.body.classList.add('mode-'+mode);
+  document.querySelectorAll('.mbtn').forEach(b=>{
+    b.classList.toggle('active', b.dataset.mode===mode);
+  });
+  const info=MODE_CONFIG[mode];
+  document.getElementById('ctx-label').textContent=info.label;
+  // 드롭다운 옵션 재구성
+  const sel=document.getElementById('ctx-select');
+  const prev=localStorage.getItem('cur_ctx_'+mode)||'';
+  sel.innerHTML='<option value="">'+info.ctxLabel+' 선택</option>';
+  info.options.forEach(o=>{
+    const op=document.createElement('option');op.value=o;op.textContent=o;
+    if(o===prev)op.selected=true;
+    sel.appendChild(op);
+  });
+  currentCtx=prev;
+  // 직접입력도 모드별로 기억
+  var ci=document.getElementById('ctx-custom');
+  if(ci){
+    ci.value=localStorage.getItem('cur_ctx_custom_'+mode)||'';
+  }
+  try{localStorage.setItem('cur_mode',mode);}catch(e){}
+  // 모드 변경 시 토스트 (최초 로드는 silent)
+  if(!silent && prevMode!==mode){
+    showToast(info.emoji+' '+info.name+' 모드로 변경됨');
+    if(navigator.vibrate)navigator.vibrate([50]);
+  }
+}
+
 function loadSelections(){
   try{
     currentWorker=localStorage.getItem('cur_worker')||'';
-    currentLocation=localStorage.getItem('cur_location')||'';
     const ws=document.getElementById('worker-select');
-    const ls=document.getElementById('location-select');
     [...ws.options].forEach(o=>{if(o.value===currentWorker)o.selected=true;});
-    [...ls.options].forEach(o=>{if(o.value===currentLocation)o.selected=true;});
-  }catch(e){}
+    currentMode=localStorage.getItem('cur_mode')||'inv';
+    setMode(currentMode, true);  // 초기 로드는 토스트 없이
+  }catch(e){setMode('inv', true);}
 }
 document.getElementById('worker-select').addEventListener('change',function(){
   currentWorker=this.value;localStorage.setItem('cur_worker',currentWorker);
 });
-document.getElementById('location-select').addEventListener('change',function(){
-  currentLocation=this.value;localStorage.setItem('cur_location',currentLocation);
+document.getElementById('ctx-select').addEventListener('change',function(){
+  currentCtx=this.value;
+  try{localStorage.setItem('cur_ctx_'+currentMode,currentCtx);}catch(e){}
+});
+// 직접입력 자동 저장 (모드별로 별도 저장)
+document.getElementById('ctx-custom').addEventListener('input',function(){
+  try{localStorage.setItem('cur_ctx_custom_'+currentMode,this.value);}catch(e){}
+});
+document.getElementById('ctx-custom-clear').addEventListener('click',function(){
+  var ci=document.getElementById('ctx-custom'); if(ci) ci.value='';
+  try{localStorage.removeItem('cur_ctx_custom_'+currentMode);}catch(e){}
+});
+document.querySelectorAll('.mbtn').forEach(b=>{
+  b.addEventListener('click',()=>setMode(b.dataset.mode));
 });
 
 // ↓↓↓ 텔레그램 설정 ↓↓↓
@@ -562,10 +799,11 @@ async function sendToTelegram(rec,prefix){
   try{
     const f=rec.fields||[];
     const fn=['바코드','품명','수량','비고','시트명','파레트위치','구분','업체명'];
+    const modeLabel=rec.mode?(MODE_CONFIG[rec.mode]||MODE_CONFIG.inv).ctxLabel:'위치';
     const lines=[prefix,
       ...f.map((v,i)=>v?(fn[i]||'항목'+(i+1))+': '+v:'').filter(Boolean),
       rec.worker?'👤 작업자: '+rec.worker:'',
-      rec.location?'📍 위치: '+rec.location:'',
+      (rec.ctx||rec.location)?(modeLabel+': '+(rec.ctx||rec.location)):'',
       '🕐 '+rec.datetime
     ].filter(Boolean).join('\n');
     for(const chatId of TG_CHAT_IDS){
@@ -593,19 +831,20 @@ async function sendTelegramFile(blob,filename,caption){
 const GS_URL='https://script.google.com/macros/s/AKfycbwkbhcT42ncKjOjBJ3qXbddGzXYv511J5bxQi5sEOAmgGM_BoirRTqF8s5gvbw2J0B88w/exec';
 async function sendToSheet(rec){
   try{
-    const row=[rec.datetime,...(rec.fields||[]),rec.worker||'',rec.location||''];
+    const modeName=(MODE_CONFIG[rec.mode||'inv']||{}).name||'재고파악';
+    const row=[rec.datetime,modeName,...(rec.fields||[]),rec.worker||'',rec.ctx||rec.location||''];
     await fetch(GS_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify({row})});
   }catch(e){}
 }
 
 function makeFilename(ext){
   const now=new Date(),p=n=>String(n).padStart(2,'0');
-  return '재고파악_'+(currentWorker||'작업자없음')+'_'+now.getFullYear()+'-'+p(now.getMonth()+1)+'-'+p(now.getDate())+'_'+p(now.getHours())+'_'+p(now.getMinutes())+'.'+ext;
+  const modeName=(MODE_CONFIG[currentMode]||{}).name||'기록';
+  return modeName+'_'+(currentWorker||'작업자없음')+'_'+now.getFullYear()+'-'+p(now.getMonth()+1)+'-'+p(now.getDate())+'_'+p(now.getHours())+'_'+p(now.getMinutes())+'.'+ext;
 }
 
 document.getElementById('cam-start-btn').addEventListener('click',()=>{
   if(!currentWorker){showToast('작업자를 선택해주세요');return;}
-  if(!currentLocation){showToast('위치를 선택해주세요');return;}
   document.getElementById('cam-start-btn').style.display='none';
   document.getElementById('cam-status').style.display='block';
   startCam();
@@ -613,7 +852,6 @@ document.getElementById('cam-start-btn').addEventListener('click',()=>{
 
 document.getElementById('manual-btn').addEventListener('click',()=>{
   if(!currentWorker){showToast('작업자를 선택해주세요');return;}
-  if(!currentLocation){showToast('위치를 선택해주세요');return;}
   ['m-f0','m-f1','m-f2','m-f3','m-f4','m-f5','m-f6','m-f7'].forEach(id=>{document.getElementById(id).value='';});
   document.getElementById('mm').style.display='flex';
   setTimeout(()=>document.getElementById('m-f0').focus(),100);
@@ -626,9 +864,18 @@ document.getElementById('m-ok').addEventListener('click',()=>{
   document.getElementById('mm').style.display='none';
   const qty=parseFloat(vals[2]);
   vals[2]=String(qty);
-  const rec={barcode:vals.join('/'),fields:vals,datetime:fmt(new Date()),qty,worker:currentWorker,location:currentLocation};
+  const customVal=(document.getElementById('ctx-custom')||{}).value?.trim()||'';
+  const finalCtx=customVal||currentCtx||'';
+  const rec={
+    barcode:vals.join('/'),fields:vals,datetime:fmt(new Date()),qty,
+    worker:currentWorker,
+    mode:currentMode,
+    ctx:finalCtx,
+    location:(currentMode==='inv')?finalCtx:''
+  };
   records.push(rec);save();renderList();
-  sendToTelegram(rec,'✏️ 수기입력');sendToSheet(rec);
+  sendToTelegram(rec,'✏️ '+MODE_CONFIG[currentMode].emoji+' '+MODE_CONFIG[currentMode].name+' 수기입력');
+  sendToSheet(rec);
   showToast('저장되었습니다');
 });
 
@@ -645,15 +892,20 @@ function doImport(file){
       if(rows.length<2){showToast('데이터가 없습니다');return;}
       const headers=rows[0];
       const imported=[];
+      const modeMap={'입고':'in','출고':'out','재고파악':'inv'};
       for(let i=1;i<rows.length;i++){
         const row=rows[i];if(!row.some(v=>v))continue;
         const datetime=String(row[0]||'');
-        const wi=headers.indexOf('작업자'),li=headers.indexOf('위치');
+        const mi=headers.indexOf('모드');
+        const modeStr=mi>=0?String(row[mi]||''):'';
+        const mode=modeMap[modeStr]||'inv';
+        const wi=headers.indexOf('작업자');
+        const cxi=headers.indexOf('사유/위치')>=0?headers.indexOf('사유/위치'):headers.indexOf('위치');
         const worker=wi>=0?String(row[wi]||''):'';
-        const location=li>=0?String(row[li]||''):'';
+        const ctx=cxi>=0?String(row[cxi]||''):'';
         const fields=[];
-        headers.forEach((h,hi)=>{if(h==='날짜/시간'||h==='작업자'||h==='위치')return;fields.push(String(row[hi]||''));});
-        imported.push({barcode:fields.join('/'),fields,datetime,qty:parseFloat(fields[2])||1,worker,location});
+        headers.forEach((h,hi)=>{if(h==='날짜/시간'||h==='모드'||h==='작업자'||h==='사유/위치'||h==='위치')return;fields.push(String(row[hi]||''));});
+        imported.push({barcode:fields.join('/'),fields,datetime,qty:parseFloat(fields[2])||1,worker,mode,ctx,location:mode==='inv'?ctx:''});
       }
       if(!imported.length){showToast('불러올 데이터가 없습니다');return;}
       records=imported;save();renderList();
